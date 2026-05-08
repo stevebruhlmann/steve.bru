@@ -277,6 +277,10 @@ a {
   color: var(--text);
 }
 
+.nav-link.active {
+  color: var(--text);
+}
+
 .nav-sep {
   color: var(--accent);
   opacity: 0.4;
