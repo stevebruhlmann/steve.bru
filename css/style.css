@@ -133,7 +133,7 @@ a {
 #site-logo {
   font-family: var(--font-display);
   font-weight: 300;
-  font-size: clamp(3.5rem, 10vw, 7rem);
+  font-size: clamp(4rem, 12vw, 8rem);
   letter-spacing: 0.04em;
   color: var(--text);
   cursor: default;
@@ -142,21 +142,21 @@ a {
 
   /* Position initiale : centré dans la page */
   position: fixed;
-  top: 50%;
+  top: 50vh;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 200;
 
   transition:
-    font-size var(--transition),
-    top var(--transition),
-    left var(--transition),
-    transform var(--transition);
+  font-size var(--transition),
+  top var(--transition),
+  left var(--transition),
+  transform var(--transition);
 }
 
 /* État après scroll : dans la navbar */
 #site-logo.in-nav {
-  font-size: 1.25rem;
+  font-size: 1.8rem;
   top: calc(var(--nav-h) / 2);
   left: 50%;
   transform: translate(-50%, -50%);
@@ -501,6 +501,12 @@ a {
   #main-content {
     padding-left: 24px;
     padding-right: 24px;
+    opacity: 0;
+    transition: opacity 0.55s ease;
+  }
+
+  #main-content.revealed {
+    opacity: 1;
   }
 
   .universe-grid {
