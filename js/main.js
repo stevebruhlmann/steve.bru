@@ -41,7 +41,7 @@ function triggerReveal() {
   scrollHint.classList.add('hidden');
   heroScreen.classList.add('triggered');
   logo.classList.add('in-nav');
-  mainContent.classList.add('revealed');
+  // mainContent.classList.add('revealed');
 
   setTimeout(() => {
     navbar.classList.add('scrolled');
@@ -49,11 +49,12 @@ function triggerReveal() {
     navRight.classList.add('visible');
     hamburger.classList.add('visible');
     logo.style.cursor = 'pointer';
+    mainContent.classList.add('revealed');
   }, 320);
 
   setTimeout(() => {
     heroScreen.classList.add('done');
-  }, 900);
+  }, 500);
 }
 
 window.addEventListener('scroll', () => {

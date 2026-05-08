@@ -54,6 +54,7 @@ a {
 ══════════════════════════════════════════════════════ */
 
 #hero-screen {
+  background: var(--bg);
   position: fixed;
   inset: 0;
   z-index: 100;
@@ -61,8 +62,8 @@ a {
   align-items: center;
   justify-content: center;
   pointer-events: none;
-  transition: opacity 0.4s ease 0.8s, visibility 0.4s ease 0.8s;
-}
+  /* transition: opacity 0.4s ease 0.3s, visibility 0.4s ease 0.3s; */
+  transition: opacity 0.3s ease, visibility 0.3s ease;}
 
 #hero-screen.done {
   opacity: 0;
@@ -240,7 +241,9 @@ a {
   display: flex;
   gap: 32px;
   opacity: 0;
-  transition: opacity 0.4s ease 0.3s;
+  /* transition: opacity 0.4s ease 0.3s; */
+  transition: opacity 0.55s ease;
+  
 }
 
 .nav-left.visible,
@@ -373,12 +376,18 @@ a {
 ══════════════════════════════════════════════════════ */
 
 #main-content {
-  padding-top: calc(100vh + 80px);
+  padding-top: calc(var(--nav-h) + 16px);
   max-width: 860px;
   margin: 0 auto;
   padding-left: 40px;
   padding-right: 40px;
   padding-bottom: 120px;
+  opacity: 0;
+  transition: opacity 0.55s ease;
+}
+
+#main-content.revealed {
+  opacity: 1;
 }
 
 .section {
@@ -501,13 +510,13 @@ a {
   #main-content {
     padding-left: 24px;
     padding-right: 24px;
-    opacity: 0;
+    /*opacity: 0;*/
     transition: opacity 0.55s ease;
   }
 
-  #main-content.revealed {
+  /*#main-content.revealed {
     opacity: 1;
-  }
+  }*/
 
   .universe-grid {
     flex-direction: column;
