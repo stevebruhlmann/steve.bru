@@ -57,6 +57,7 @@ a {
   position: fixed;
   inset: 0;
   z-index: 100;
+  background: var(--bg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -80,7 +81,7 @@ a {
 #site-logo {
   font-family: var(--font-display);
   font-weight: 300;
-  font-size: clamp(6.3rem, 18vw, 12.6rem);
+  font-size: clamp(5.25rem, 15vw, 10.5rem);
   letter-spacing: 0.04em;
   color: var(--text);
   cursor: default;
@@ -93,6 +94,7 @@ a {
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 200;
+  will-change: font-size, top, transform;
 
   transition:
     font-size var(--transition),
@@ -103,7 +105,7 @@ a {
 
 /* État après scroll : dans la navbar */
 #site-logo.in-nav {
-  font-size: 2.2rem;
+  font-size: 1.9rem;
   top: calc(var(--nav-h) / 2);
   left: 50%;
   transform: translate(-50%, -50%);
