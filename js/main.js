@@ -121,7 +121,14 @@ const sections = document.querySelectorAll('.section');
 function updateActiveSection() {
   const middle = window.innerHeight / 2;
   const atBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 50;
-  
+  const atTop = window.scrollY < 50;
+
+  if (atTop) {
+    sections.forEach(s => s.classList.add('dim'));
+    sections[0].classList.remove('dim');
+    return;
+  }
+
   if (atBottom) {
     sections.forEach(s => s.classList.add('dim'));
     sections[sections.length - 1].classList.remove('dim');
