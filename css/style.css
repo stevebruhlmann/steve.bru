@@ -57,7 +57,6 @@ a {
   position: fixed;
   inset: 0;
   z-index: 100;
-  background: var(--bg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -71,7 +70,60 @@ a {
   pointer-events: none;
 }
 
+/* Couche de flou sur le contenu derrière */
+#hero-blur-layer {
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(24px) brightness(0.35);
+  -webkit-backdrop-filter: blur(24px) brightness(0.35);
+  transition: backdrop-filter var(--transition), -webkit-backdrop-filter var(--transition);
+  z-index: 1;
+}
 
+#hero-screen.triggered #hero-blur-layer {
+  backdrop-filter: blur(0px) brightness(1);
+  -webkit-backdrop-filter: blur(0px) brightness(1);
+}
+
+/* Contenu visible derrière le flou (univers) */
+#hero-content-behind {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 60px;
+  padding: 120px 40px 40px;
+}
+
+.tagline {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.universe-grid {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.uni-card {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 300;
+  letter-spacing: 0.08em;
+  color: rgba(245,244,240,0.25);
+  border: 1px solid rgba(255,255,255,0.06);
+  padding: 20px 36px;
+  border-radius: 2px;
+  transition: color 0.3s, border-color 0.3s;
+}
 
 
 /* ══════════════════════════════════════════════════════
@@ -81,7 +133,7 @@ a {
 #site-logo {
   font-family: var(--font-display);
   font-weight: 300;
-  font-size: clamp(5.25rem, 15vw, 10.5rem);
+  font-size: clamp(3.5rem, 10vw, 7rem);
   letter-spacing: 0.04em;
   color: var(--text);
   cursor: default;
@@ -94,7 +146,6 @@ a {
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 200;
-  will-change: font-size, top, transform;
 
   transition:
     font-size var(--transition),
@@ -105,7 +156,7 @@ a {
 
 /* État après scroll : dans la navbar */
 #site-logo.in-nav {
-  font-size: 1.9rem;
+  font-size: 1.25rem;
   top: calc(var(--nav-h) / 2);
   left: 50%;
   transform: translate(-50%, -50%);
@@ -322,20 +373,12 @@ a {
 ══════════════════════════════════════════════════════ */
 
 #main-content {
-  padding-top: 65vh;
+  padding-top: calc(100vh + 80px);
   max-width: 860px;
   margin: 0 auto;
   padding-left: 40px;
   padding-right: 40px;
   padding-bottom: 120px;
-
-  /* Caché au chargement — révélé en fondu au scroll */
-  opacity: 0;
-  transition: opacity 0.7s ease 0.3s;
-}
-
-#main-content.revealed {
-  opacity: 1;
 }
 
 .section {
