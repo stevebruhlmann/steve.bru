@@ -41,6 +41,9 @@ body {
   font-weight: 300;
   line-height: 1.6;
   overflow-x: hidden;
+
+  /* Pour empêcher la page de scroller au premier scroll permettant au titre steve.bru de se ranger dans la navbar */
+  /* overscroll-behavior: none; */
 }
 
 a {
@@ -230,10 +233,11 @@ a {
 }
 
 #navbar.scrolled {
-  background: rgba(18,17,15,0.92);
-  border-bottom-color: var(--border);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  /* background: rgba(20,28,28,0.01); */
+  background: rgba(74,154,142,0.1);
+  border-bottom-color: var(--accent );
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(5px);
 }
 
 .nav-left,

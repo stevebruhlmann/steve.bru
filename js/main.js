@@ -3,6 +3,10 @@ if ('scrollRestoration' in history) {
 }
 window.scrollTo(0, 0);
 
+// Pour empêcher la page de scroller au premier scroll permettant au titre steve.bru de se ranger dans la navbar
+// document.body.style.overflow = 'hidden';
+// document.body.style.touchAction = 'none';
+
 const logo        = document.getElementById('site-logo');
 const heroScreen  = document.getElementById('hero-screen');
 const scrollHint  = document.getElementById('scroll-hint');
@@ -13,6 +17,11 @@ const hamburger   = document.getElementById('hamburger');
 const mobileMenu  = document.getElementById('mobile-menu');
 const mobileClose = document.getElementById('mobile-close');
 const mainContent = document.getElementById('main-content');
+
+// Durée en ms avant laquelle le steve.bru se range automatiquement dans la navbar (instantané si scroll)
+setTimeout(() => {
+  triggerReveal();
+}, 1000);
 
 let triggered = false;
 let menuOpen  = false;
@@ -54,6 +63,10 @@ function triggerReveal() {
 
   setTimeout(() => {
     heroScreen.classList.add('done');
+
+    // Pour empêcher la page de scroller au premier scroll permettant au titre steve.bru de se ranger dans la navbar
+    // document.body.style.overflow = '';
+    // document.body.style.touchAction = '';
   }, 500);
 }
 
