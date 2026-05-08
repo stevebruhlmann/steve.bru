@@ -114,3 +114,30 @@ mobileClose.addEventListener('click', closeMenu);
 document.querySelectorAll('.mobile-link').forEach(link => {
   link.addEventListener('click', closeMenu);
 });
+
+// Illumnine chaque section de la page d'accueil durant le scroll - START
+const sections = document.querySelectorAll('.section');
+
+function updateActiveSection() {
+  const middle = window.innerHeight / 2;
+  const atBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 50;
+  
+  if (atBottom) {
+    sections.forEach(s => s.classList.add('dim'));
+    sections[sections.length - 1].classList.remove('dim');
+    return;
+  }
+
+  sections.forEach(section => {
+    const rect = section.getBoundingClientRect();
+    if (rect.top <= middle && rect.bottom >= middle) {
+      sections.forEach(s => s.classList.add('dim'));
+      section.classList.remove('dim');
+    }
+  });
+}
+
+sections.forEach(s => s.classList.add('dim'));
+sections[0].classList.remove('dim');
+window.addEventListener('scroll', updateActiveSection, { passive: true });
+// Illumnine chaque section de la page d'accueil durant le scroll - FIN
