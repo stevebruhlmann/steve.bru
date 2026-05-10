@@ -18,11 +18,6 @@ const mobileMenu  = document.getElementById('mobile-menu');
 const mobileClose = document.getElementById('mobile-close');
 const mainContent = document.getElementById('main-content');
 
-// Durée en ms avant laquelle le steve.bru se range automatiquement dans la navbar (instantané si scroll)
-setTimeout(() => {
-  triggerReveal();
-}, 1000);
-
 let triggered = false;
 let menuOpen  = false;
 
@@ -70,6 +65,11 @@ function triggerReveal() {
   }, 500);
 }
 
+// Durée en ms avant laquelle le steve.bru se range automatiquement dans la navbar (instantané si scroll)
+setTimeout(() => {
+  triggerReveal();
+}, 1000);
+
 window.addEventListener('scroll', () => {
   if (!triggered && window.scrollY > 10) triggerReveal();
 }, { passive: true });
@@ -115,36 +115,76 @@ document.querySelectorAll('.mobile-link').forEach(link => {
   link.addEventListener('click', closeMenu);
 });
 
-// Illumnine chaque section de la page d'accueil durant le scroll - START
+// ── Scroll spy : illumine la section active + lien navbar correspondant ──
+
+// const sections = document.querySelectorAll('.section');
+
+// function setActive(activeSection) {
+//   sections.forEach(s => s.classList.add('dim'));
+//   activeSection.classList.remove('dim');
+//   document.querySelectorAll('.nav-link').forEach(link => {
+//     link.classList.remove('active');
+//     if (link.getAttribute('href') === '#' + activeSection.id) {
+//       link.classList.add('active');
+//     }
+//   });
+// }
+
+// function updateActiveSection() {
+//   const atTop    = window.scrollY < 150;
+//   const atBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 50;
+
+//   if (atTop)    { setActive(sections[0]);                    return; }
+//   if (atBottom) { setActive(sections[sections.length - 1]); return; }
+
+//   const middle = window.innerHeight / 2;
+//   sections.forEach(section => {
+//     const rect = section.getBoundingClientRect();
+//     if (rect.top <= middle && rect.bottom >= middle) {
+//       setActive(section);
+//     }
+//   });
+// }
+
+// // Initialisation : première section active au chargement
+// setActive(sections[0]);
+// window.addEventListener('scroll', updateActiveSection, { passive: true });
+
 const sections = document.querySelectorAll('.section');
 
-function updateActiveSection() {
-  const middle = window.innerHeight / 2;
-  const atBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 50;
-  const atTop = window.scrollY < 150;
-
-  if (atTop) {
-    sections.forEach(s => s.classList.add('dim'));
-    sections[0].classList.remove('dim');
-    return;
-  }
-
-  if (atBottom) {
-    sections.forEach(s => s.classList.add('dim'));
-    sections[sections.length - 1].classList.remove('dim');
-    return;
-  }
-
-  sections.forEach(section => {
-    const rect = section.getBoundingClientRect();
-    if (rect.top <= middle && rect.bottom >= middle) {
-      sections.forEach(s => s.classList.add('dim'));
-      section.classList.remove('dim');
+function setActive(activeSection) {
+  sections.forEach(s => s.classList.add('dim'));
+  activeSection.classList.remove('dim');
+  document.querySelectorAll('.nav-link').forEach(link => {
+    link.classList.remove('active');
+    if (link.getAttribute('href') === '#' + activeSection.id) {
+      link.classList.add('active');
     }
   });
 }
 
-sections.forEach(s => s.classList.add('dim'));
-sections[0].classList.remove('dim');
-window.addEventListener('scroll', updateActiveSection, { passive: true });
-// Illumnine chaque section de la page d'accueil durant le scroll - FIN
+// Initialisation : première section active au chargement
+setActive(sections[0]);
+
+// Clic navbar → active immédiatement la bonne section
+document.querySelectorAll('.nav-link').forEach(link => {
+  link.addEventListener('click', () => {
+    const targetId = link.getAttribute('href').replace('#', '');
+    const target = document.getElementById(targetId);
+    if (target) setActive(target);
+  });
+});
+
+// IntersectionObserver : détecte la section dans la zone centrale de l'écran
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      setActive(entry.target);
+    }
+  });
+}, {
+  rootMargin: '-20% 0px -50% 0px',
+  threshold: 0
+});
+
+sections.forEach(s => observer.observe(s));
