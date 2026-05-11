@@ -26,7 +26,6 @@ const scrollHint  = document.getElementById('scroll-hint');
 const navbar      = document.getElementById('navbar');
 const navLeft     = document.getElementById('nav-left');
 const navRight    = document.getElementById('nav-right');
-const navPlaceholder = document.getElementById('nav-logo-placeholder');
 const hamburger   = document.getElementById('hamburger');
 const mobileMenu  = document.getElementById('mobile-menu');
 const mobileClose = document.getElementById('mobile-close');
@@ -59,7 +58,6 @@ if (alreadySeen) {
   heroScreen.classList.add('done');
   scrollHint.classList.add('hidden');
   mainContent.classList.add('revealed');
-  checkNavOverflow();
 }
 
 // triggerReveal : joue l'animation de rangement du logo dans la navbar,
@@ -132,50 +130,28 @@ logo.addEventListener('click', () => {
 
 
 // ══════════════════════════════════════════════════════
-// NAVBAR RESPONSIVE — 3 états automatiques
-//
-// Le logo est toujours position:fixed, jamais dans le flux.
-// Le placeholder (#nav-logo-placeholder) occupe sa place
-// dans le flexbox et permet des calculs de position fiables.
-//
-// État 1 — Normal  : tout tient sur une ligne
-// État 2 — Stacked : nav-left chevauche le placeholder
-//                    → liens passent sur la ligne du dessous
-// État 3 — Compact : même en stacked ça ne tient plus
-//                    → hamburger uniquement
-//
-// On compare les positions réelles du placeholder et de
-// nav-left pour détecter le chevauchement.
+// NAVBAR RESPONSIVE — bascule vers hamburger si manque de place
+// On mesure la largeur totale nécessaire des éléments et on
+// la compare à la largeur de la fenêtre. Si ça ne rentre pas,
+// on cache les liens et on affiche le hamburger.
+// On utilise window.innerWidth plutôt que getBoundingClientRect
+// sur le logo (qui est fixed et fausse les calculs).
 // ══════════════════════════════════════════════════════
 
 function checkNavOverflow() {
+  // Ne rien faire si les éléments ne sont pas encore visibles
   if (!navLeft.classList.contains('visible')) return;
 
-  // Réinitialise pour mesurer en état normal
-  navbar.classList.remove('stacked', 'compact');
+  // Largeur réelle de chaque groupe de liens
+  const leftWidth  = navLeft.scrollWidth;
+  const rightWidth = navRight.scrollWidth;
+  const logoWidth  = logo.scrollWidth;
+  const padding    = 80;  // 40px de padding de chaque côté
+  const gap        = 80;  // espace minimum entre les éléments
 
-  // Maintenant on mesure les positions réelles
-  const leftRect  = navLeft.getBoundingClientRect();
-  const rightRect = navRight.getBoundingClientRect();
-  const logoRect  = logo.getBoundingClientRect();
+  const totalNeeded = leftWidth + logoWidth + rightWidth + padding + gap;
 
-  // Chevauchement : nav-left empiète sur le logo, ou nav-right empiète sur le logo
-  const overlapLeft  = leftRect.right  > logoRect.left;
-  const overlapRight = rightRect.left < logoRect.right;
-
-  if (overlapLeft || overlapRight) {
-    navbar.classList.add('stacked');
-
-    // En stacked, vérifie si nav-left et nav-right tiennent sur une ligne
-    const stackedLeftRect  = navLeft.getBoundingClientRect();
-    const stackedRightRect = navRight.getBoundingClientRect();
-
-    const neededStacked = navLeft.scrollWidth + navRight.scrollWidth + 80;
-    if (neededStacked > navbar.getBoundingClientRect().width) {
-      navbar.classList.remove('stacked');
-      navbar.classList.add('compact');
-    }
-  }
+  navbar.classList.toggle('compact', totalNeeded > window.innerWidth);
 }
 
 // Appel à chaque resize de fenêtre

@@ -26,7 +26,6 @@ const scrollHint  = document.getElementById('scroll-hint');
 const navbar      = document.getElementById('navbar');
 const navLeft     = document.getElementById('nav-left');
 const navRight    = document.getElementById('nav-right');
-const navPlaceholder = document.getElementById('nav-logo-placeholder');
 const hamburger   = document.getElementById('hamburger');
 const mobileMenu  = document.getElementById('mobile-menu');
 const mobileClose = document.getElementById('mobile-close');
@@ -59,7 +58,6 @@ if (alreadySeen) {
   heroScreen.classList.add('done');
   scrollHint.classList.add('hidden');
   mainContent.classList.add('revealed');
-  checkNavOverflow();
 }
 
 // triggerReveal : joue l'animation de rangement du logo dans la navbar,
@@ -84,8 +82,6 @@ function triggerReveal() {
     hamburger.classList.add('visible');
     logo.style.cursor = 'pointer';
     mainContent.classList.add('revealed');
-    // On vérifie le responsive après que les éléments soient visibles
-    checkNavOverflow();
   }, 320);
 
   // Délai 500ms : masque complètement le hero-screen une fois l'animation terminée
@@ -123,64 +119,32 @@ window.addEventListener('touchmove', (e) => {
   if (!triggered && (touchStartY - e.touches[0].clientY) > 20) triggerReveal();
 }, { passive: true });
 
-// Clic sur le logo → retour en haut de page
+// Clic sur le logo → retour en haut de page (= retour index.html si on est dessus,
+// ou navigation vers index.html depuis une autre page via le href du logo dans le HTML)
 logo.addEventListener('click', () => {
   if (triggered) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 });
 
-
 // ══════════════════════════════════════════════════════
-// NAVBAR RESPONSIVE — 3 états automatiques
-//
-// Le logo est toujours position:fixed, jamais dans le flux.
-// Le placeholder (#nav-logo-placeholder) occupe sa place
-// dans le flexbox et permet des calculs de position fiables.
-//
-// État 1 — Normal  : tout tient sur une ligne
-// État 2 — Stacked : nav-left chevauche le placeholder
-//                    → liens passent sur la ligne du dessous
-// État 3 — Compact : même en stacked ça ne tient plus
-//                    → hamburger uniquement
-//
-// On compare les positions réelles du placeholder et de
-// nav-left pour détecter le chevauchement.
+// NAVBAR RESPONSIVE — bascule vers hamburger si manque de place
+// Quand les liens chevauchent le logo, on cache nav-left/nav-right
+// et on affiche le hamburger — exactement comme sur mobile.
+// Le logo n'est jamais touché, aucune animation parasite.
 // ══════════════════════════════════════════════════════
 
 function checkNavOverflow() {
-  if (!navLeft.classList.contains('visible')) return;
-
-  // Réinitialise pour mesurer en état normal
-  navbar.classList.remove('stacked', 'compact');
-
-  // Maintenant on mesure les positions réelles
+  const logoRect  = logo.getBoundingClientRect();
   const leftRect  = navLeft.getBoundingClientRect();
   const rightRect = navRight.getBoundingClientRect();
-  const logoRect  = logo.getBoundingClientRect();
 
-  // Chevauchement : nav-left empiète sur le logo, ou nav-right empiète sur le logo
-  const overlapLeft  = leftRect.right  > logoRect.left;
-  const overlapRight = rightRect.left < logoRect.right;
-
-  if (overlapLeft || overlapRight) {
-    navbar.classList.add('stacked');
-
-    // En stacked, vérifie si nav-left et nav-right tiennent sur une ligne
-    const stackedLeftRect  = navLeft.getBoundingClientRect();
-    const stackedRightRect = navRight.getBoundingClientRect();
-
-    const neededStacked = navLeft.scrollWidth + navRight.scrollWidth + 80;
-    if (neededStacked > navbar.getBoundingClientRect().width) {
-      navbar.classList.remove('stacked');
-      navbar.classList.add('compact');
-    }
-  }
+  const overlap = leftRect.right > logoRect.left || rightRect.left < logoRect.right;
+  navbar.classList.toggle('compact', overlap);
 }
 
-// Appel à chaque resize de fenêtre
+checkNavOverflow();
 window.addEventListener('resize', checkNavOverflow, { passive: true });
-
 
 // ══════════════════════════════════════════════════════
 // MENU MOBILE
@@ -249,6 +213,7 @@ const sections = document.querySelectorAll('.section');
 
 if (window.matchMedia('(pointer: fine)').matches) {
   // Desktop uniquement
+
   sections.forEach(section => {
     section.addEventListener('mouseenter', () => {
       // Assombrit toutes les sections, puis illumine celle survolée

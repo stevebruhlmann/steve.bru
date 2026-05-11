@@ -23,14 +23,6 @@
 
   <!-- ══════════════════════════════════════════════
        NAVBAR — apparaît après le premier scroll
-       Structure :
-       - nav-left  : liens gauche (Voyages, Photo, 3D)
-       - nav-logo-placeholder : espace réservé au logo dans le flux flex
-         (le vrai logo est fixed par-dessus, ce placeholder permet au
-         flexbox de calculer correctement les positions)
-       - nav-right : liens droite (Contact, ···)
-       - site-logo : le vrai logo, position fixed, centré sur la fenêtre
-       - hamburger : menu mobile, caché sur desktop
   ══════════════════════════════════════════════ -->
   <nav id="navbar">
     <div class="nav-left" id="nav-left">
@@ -41,9 +33,6 @@
       <a href="impression3d.html" class="nav-link">Impression 3d</a>
     </div>
 
-    <!-- Placeholder invisible qui réserve la place du logo dans le flux flex -->
-    <div id="nav-logo-placeholder">steve.bru</div>
-
     <a class="nav-logo" id="site-logo" href="index.html">steve.bru</a>
 
     <div class="nav-right" id="nav-right">
@@ -51,7 +40,7 @@
       <a href="#" class="nav-link nav-more">···</a>
     </div>
 
-    <!-- Hamburger : affiché sur mobile ou quand la navbar est trop étroite -->
+    <!-- Mobile uniquement -->
     <button class="hamburger" id="hamburger" aria-label="Menu">
       <span></span><span></span><span></span>
     </button>
@@ -61,9 +50,9 @@
   <div class="mobile-menu" id="mobile-menu">
     <button class="mobile-menu-close" id="mobile-close">✕</button>
     <nav class="mobile-nav">
-      <a href="voyages.html" class="mobile-link">Voyages</a>
-      <a href="photo.html" class="mobile-link">Photo</a>
-      <a href="impression3d.html" class="mobile-link">3D</a>
+      <a href="#voyages" class="mobile-link">Voyages</a>
+      <a href="#photo" class="mobile-link">Photo</a>
+      <a href="#impression3d" class="mobile-link">3D</a>
       <div class="mobile-divider"></div>
       <a href="#contact" class="mobile-link mobile-link--secondary">Contact</a>
     </nav>

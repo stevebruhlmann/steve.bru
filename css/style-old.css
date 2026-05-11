@@ -72,10 +72,6 @@ a {
 
 /* ══════════════════════════════════════════════════════
    LOGO HERO — le grand steve.bru central
-   Le logo est toujours en position fixed, centré sur la
-   fenêtre. Il ne participe jamais au flux flex de la navbar.
-   C'est le placeholder #nav-logo-placeholder qui occupe
-   sa place dans le flex pour les calculs de layout.
 ══════════════════════════════════════════════════════ */
 
 #site-logo {
@@ -106,25 +102,13 @@ a {
     transform var(--transition);
 }
 
-/* État après scroll : dans la navbar — taille fixe, jamais modifiée */
+/* État après scroll : dans la navbar */
 #site-logo.in-nav {
   font-size: 1.8rem;
   top: calc(var(--nav-h) / 2);
   left: 50%;
   transform: translate(-50%, -50%);
   cursor: pointer;
-}
-
-/* Placeholder invisible — même taille que le logo in-nav,
-   occupe l'espace dans le flexbox à la place du logo fixed */
-#nav-logo-placeholder {
-  font-family: var(--font-display);
-  font-size: 1.8rem;
-  letter-spacing: 0.04em;
-  white-space: nowrap;
-  visibility: hidden;
-  pointer-events: none;
-  /* Même contenu que le logo — défini par JS */
 }
 
 @keyframes fadeIn {
@@ -178,10 +162,6 @@ a {
 
 /* ══════════════════════════════════════════════════════
    NAVBAR
-   3 états gérés par JS :
-   1. Normal  : tout sur une ligne (nav-left | placeholder | nav-right)
-   2. Stacked : liens sur 2 lignes (logo ligne 1, liens ligne 2)
-   3. Compact : hamburger uniquement (mobile ou très étroit)
 ══════════════════════════════════════════════════════ */
 
 #navbar {
@@ -197,7 +177,7 @@ a {
   padding: 0 40px;
   background: transparent;
   border-bottom: 1px solid transparent;
-  transition: background var(--transition), border-color var(--transition), height var(--transition);
+  transition: background var(--transition), border-color var(--transition);
 }
 
 #navbar.scrolled {
@@ -246,7 +226,7 @@ a {
   letter-spacing: 0.05em;
 }
 
-/* Hamburger — caché par défaut */
+/* Mobile : hamburger caché sur desktop */
 .hamburger {
   display: none;
   flex-direction: column;
@@ -269,59 +249,6 @@ a {
   height: 1px;
   background: var(--text);
   transition: transform 0.3s, opacity 0.3s;
-}
-
-
-/* ══════════════════════════════════════════════════════
-   ÉTAT STACKED — liens sur 2 lignes
-   Déclenché par JS quand nav-left chevauche le placeholder.
-   La navbar passe en flex-wrap, le placeholder prend toute
-   la largeur sur la ligne 1 (logo flotte par-dessus centré),
-   nav-left et nav-right se retrouvent sur la ligne 2.
-══════════════════════════════════════════════════════ */
-
-#navbar.stacked {
-  flex-wrap: wrap;
-  height: auto;
-  min-height: var(--nav-h);
-  padding: 14px 40px;
-  row-gap: 10px;
-  align-items: center;
-}
-
-/* Le placeholder occupe toute la largeur → force le saut de ligne */
-#navbar.stacked #nav-logo-placeholder {
-  width: 100%;
-  height: calc(var(--nav-h) / 2 - 10px);
-  flex-basis: 100%;
-}
-
-#navbar.stacked .nav-left {
-  flex: 1;
-  flex-basis: auto;
-}
-
-#navbar.stacked .nav-right {
-  flex: 1;
-  justify-content: flex-end;
-}
-
-
-/* ══════════════════════════════════════════════════════
-   ÉTAT COMPACT — hamburger uniquement
-   Déclenché par JS quand même le stacked ne suffit plus.
-   Le logo reste centré, les liens sont cachés.
-══════════════════════════════════════════════════════ */
-
-#navbar.compact .nav-left,
-#navbar.compact .nav-right,
-#navbar.compact #nav-logo-placeholder {
-  display: none;
-}
-
-#navbar.compact .hamburger {
-  display: flex;
-  opacity: 1;
 }
 
 
@@ -425,7 +352,7 @@ a {
   transition: opacity 0.4s ease;
 }
 
-/* Section inactive — assombrie au hover d'une autre section */
+/* Section inactive — assombrie par le scroll spy */
 .section.dim {
   opacity: 0.25;
 }
@@ -511,18 +438,43 @@ a {
   color: rgba(245,244,240,0.15);
 }
 
+/* ══════════════════════════════════════════════════════
+   NAVBAR STACKED — layout 2 lignes quand la place manque
+   Le logo reste fixed et centré — on déplace uniquement
+   les liens en dessous via une deuxième ligne de navbar.
+══════════════════════════════════════════════════════ */
+
+#navbar.stacked .nav-left {
+  position: absolute;
+  bottom: 12px;
+  left: 40px;
+}
+
+#navbar.stacked .nav-right {
+  position: absolute;
+  bottom: 12px;
+  right: 40px;
+}
 
 /* ══════════════════════════════════════════════════════
-   RESPONSIVE — MOBILE (< 680px)
-   Le media query gère le vrai mobile uniquement.
-   Les états stacked et compact sont gérés par JS.
+   RESPONSIVE — MOBILE
 ══════════════════════════════════════════════════════ */
+
+/* Navbar compacte — hamburger à la place des liens */
+#navbar.compact .nav-left,
+#navbar.compact .nav-right {
+  display: none;
+}
+
+#navbar.compact .hamburger {
+  display: flex;
+}
 
 @media (max-width: 680px) {
 
   #navbar {
     padding: 0 24px;
-    height: var(--nav-h);
+    justify-content: space-between;
   }
 
   .nav-left,
@@ -530,21 +482,15 @@ a {
     display: none;
   }
 
-  #nav-logo-placeholder {
-    display: none;
-  }
-
   .hamburger {
     display: flex;
-    opacity: 1;
   }
 
-  /* Le logo garde toujours 1.8rem — pas de réduction sur mobile */
   #site-logo.in-nav {
-    font-size: 1.8rem;
+    font-size: 1.1rem;
     top: calc(var(--nav-h) / 2);
-    left: 50%;
-    transform: translate(-50%, -50%);
+    left: 24px;
+    transform: translateY(-50%);
   }
 
   #site-logo {
