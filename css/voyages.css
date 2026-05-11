@@ -9,23 +9,7 @@
 /* Sur index.html, #site-logo est un <div> en position:fixed animé (hero screen).
    Sur voyages.html, c'est un <a> simple dans la navbar — on écrase tout le
    comportement de style.css pour qu'il reste statique et correctement dimensionné. */
-.page-voyages #site-logo {
-  position: absolute;      /* Centrage absolu dans la navbar — comme sur index.html en état in-nav */
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 1.8rem;
-  font-family: var(--font-display);
-  font-weight: 300;
-  letter-spacing: 0.04em;
-  color: var(--text);
-  text-decoration: none;
-  cursor: pointer;
-  user-select: none;
-  white-space: nowrap;
-  animation: none;         /* Pas d'animation fadeIn */
-  z-index: 1;
-}
+   comportement de style.css pour qu'il reste statique et correctement dimensionné. */
 
 /* Lien de navigation actif — page courante */
 .nav-link--active {

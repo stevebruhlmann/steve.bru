@@ -595,33 +595,7 @@ function navigateCarousel(media, direction, total, counter) {
    n'utilise pas main.js (pas de hero screen)
 ══════════════════════════════════════════════════════ */
 
-function initMobileMenu() {
-  const hamburger   = document.getElementById('hamburger');
-  const mobileMenu  = document.getElementById('mobile-menu');
-  const mobileClose = document.getElementById('mobile-close');
 
-  if (!hamburger || !mobileMenu) return;
-
-  let menuOpen = false;
-
-  function openMenu() {
-    menuOpen = true;
-    mobileMenu.classList.add('open');
-    document.body.style.overflow = 'hidden';
-  }
-
-  function closeMenu() {
-    menuOpen = false;
-    mobileMenu.classList.remove('open');
-    document.body.style.overflow = '';
-  }
-
-  hamburger.addEventListener('click', () => menuOpen ? closeMenu() : openMenu());
-  mobileClose.addEventListener('click', closeMenu);
-  document.querySelectorAll('.mobile-link').forEach(link => {
-    link.addEventListener('click', closeMenu);
-  });
-}
 
 
 /* ══════════════════════════════════════════════════════
@@ -632,5 +606,4 @@ function initMobileMenu() {
 document.addEventListener('DOMContentLoaded', () => {
   renderVoyagesGrid(); /* Grille des voyages */
   initMap();           /* Carte D3 (async — chargement des données géo) */
-  initMobileMenu();    /* Menu hamburger mobile */
 });
