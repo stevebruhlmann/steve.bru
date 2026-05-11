@@ -1,0 +1,479 @@
+/* ══════════════════════════════════════════════════════
+   steve.bru — voyages.css
+   Styles spécifiques à la page voyages.html
+   Dépend de style.css (variables, navbar, footer, reset)
+══════════════════════════════════════════════════════ */
+
+
+/* ── AJUSTEMENT NAVBAR sur page voyages ── */
+/* Sur index.html, #site-logo est un <div> en position:fixed animé (hero screen).
+   Sur voyages.html, c'est un <a> simple dans la navbar — on écrase tout le
+   comportement de style.css pour qu'il reste statique et correctement dimensionné. */
+.page-voyages #site-logo {
+  position: absolute;      /* Centrage absolu dans la navbar — comme sur index.html en état in-nav */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.8rem;
+  font-family: var(--font-display);
+  font-weight: 300;
+  letter-spacing: 0.04em;
+  color: var(--text);
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  animation: none;         /* Pas d'animation fadeIn */
+  z-index: 1;
+}
+
+/* Lien de navigation actif — page courante */
+.nav-link--active {
+  color: var(--text) !important;
+}
+
+
+/* ══════════════════════════════════════════════════════
+   CONTENU PRINCIPAL
+══════════════════════════════════════════════════════ */
+
+#voyages-content {
+  padding-top: calc(var(--nav-h) + 48px);
+  padding-bottom: 120px;
+}
+
+
+/* ══════════════════════════════════════════════════════
+   EN-TÊTE DE PAGE
+══════════════════════════════════════════════════════ */
+
+.voyages-header {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 40px 64px;
+}
+
+.voyages-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.8rem, 7vw, 5rem);
+  font-weight: 300;
+  letter-spacing: 0.02em;
+  color: var(--text);
+  margin-bottom: 20px;
+  line-height: 1.05;
+}
+
+.voyages-intro {
+  font-size: 1rem;
+  line-height: 1.75;
+  color: var(--muted);
+  max-width: 520px;
+  margin-bottom: 40px;
+}
+
+/* Statistiques globales */
+.voyages-stats {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.stat-number {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 300;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.stat-sep {
+  color: var(--border);
+  font-size: 1.4rem;
+  padding-bottom: 16px;
+}
+
+
+/* ══════════════════════════════════════════════════════
+   SECTION CARTE
+══════════════════════════════════════════════════════ */
+
+.map-section {
+  position: relative;
+  max-width: 1100px;
+  margin: 0 auto 80px;
+  padding: 0 40px;
+}
+
+.map-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 12px;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.map-label span:first-child {
+  color: var(--accent);
+}
+
+.map-label-hint {
+  color: var(--muted);
+  font-size: 0.6rem;
+}
+
+/* Conteneur SVG D3 */
+#world-map {
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #0e0d0b;
+  border: 1px solid var(--border);
+}
+
+#world-map svg {
+  display: block;
+  width: 100%;
+}
+
+/* Pop-up carte */
+.map-popup {
+  display: none;
+  position: absolute;
+  background: #1c1b18;
+  border: 1px solid rgba(74, 154, 142, 0.35);
+  border-radius: 8px;
+  padding: 14px 18px;
+  min-width: 160px;
+  max-width: 220px;
+  z-index: 50;
+  pointer-events: none;
+
+  /* Animation d'apparition */
+  animation: popupIn 0.18s ease forwards;
+}
+
+@keyframes popupIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.map-popup.visible {
+  display: block;
+}
+
+.map-popup-flag {
+  font-size: 1.4em;
+  margin-bottom: 4px;
+  line-height: 1;
+}
+
+.map-popup-country {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 10px;
+  letter-spacing: 0.05em;
+}
+
+.map-popup-trips {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.map-popup-trips li {
+  font-size: 0.7rem;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: color 0.15s;
+  pointer-events: all;
+}
+
+/* Un voyage dans la pop-up = cliquable → scroll vers sa carte */
+.map-popup-trips li:hover {
+  color: var(--accent);
+}
+
+/* Indicateur "futur" sur les voyages prévus */
+.trip-future {
+  color: #c9a96e !important;
+}
+
+
+/* ══════════════════════════════════════════════════════
+   GRILLE DES VOYAGES
+══════════════════════════════════════════════════════ */
+
+.voyages-grid-section {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+.voyages-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+
+/* ── CARTE D'UN VOYAGE ── */
+
+.voyage-card {
+  background: #171614;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: border-color 0.25s ease;
+  scroll-margin-top: calc(var(--nav-h) + 24px);
+}
+
+.voyage-card:hover {
+  border-color: rgba(74, 154, 142, 0.4);
+}
+
+/* Zone photo + carrousel */
+.voyage-card-media {
+  position: relative;
+  aspect-ratio: 3 / 2;
+  background: #0e0d0b;
+  overflow: hidden;
+}
+
+/* Image du carrousel */
+.voyage-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+
+  /* Transition entre les slides */
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.voyage-card-img.active {
+  opacity: 1;
+}
+
+/* Placeholder quand aucune photo n'est encore disponible */
+.voyage-card-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0e0d0b;
+}
+
+.placeholder-flag {
+  font-size: 3rem;
+  opacity: 0.3;
+}
+
+/* Contrôles du carrousel (flèches) */
+.carousel-controls {
+  position: absolute;
+  bottom: 10px;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+/* Affiche les contrôles au survol de la carte */
+.voyage-card:hover .carousel-controls {
+  opacity: 1;
+}
+
+/* Bouton flèche */
+.carousel-btn {
+  background: rgba(18, 17, 15, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--text);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, border-color 0.15s;
+  user-select: none;
+}
+
+.carousel-btn:hover {
+  background: rgba(74, 154, 142, 0.3);
+  border-color: var(--accent);
+}
+
+/* Compteur de slides ex: "2 / 5" */
+.carousel-counter {
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  color: rgba(245, 244, 240, 0.5);
+  min-width: 28px;
+  text-align: center;
+}
+
+/* ── Infos texte de la carte ── */
+
+.voyage-card-body {
+  padding: 16px 18px 18px;
+}
+
+.voyage-card-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.voyage-card-flag {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.voyage-card-num {
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+.voyage-card-title {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 300;
+  color: var(--text);
+  margin-bottom: 4px;
+  line-height: 1.2;
+}
+
+.voyage-card-subtitle {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-bottom: 14px;
+}
+
+/* Lien "Voir le voyage →" */
+.voyage-card-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-bottom: 1px solid transparent;
+  padding-bottom: 2px;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.voyage-card-link:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* Badge "Bientôt" pour les voyages sans page encore */
+.voyage-card-link--soon {
+  color: rgba(245, 244, 240, 0.2);
+  cursor: default;
+  font-size: 0.65rem;
+}
+
+.voyage-card-link--soon:hover {
+  color: rgba(245, 244, 240, 0.2);
+  border-bottom-color: transparent;
+}
+
+/* Badge voyage futur (planifié) */
+.voyage-card--future {
+  border-color: rgba(201, 169, 110, 0.2);
+}
+
+.voyage-card--future:hover {
+  border-color: rgba(201, 169, 110, 0.4);
+}
+
+.badge-futur {
+  display: inline-block;
+  font-size: 0.55rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #c9a96e;
+  border: 1px solid rgba(201, 169, 110, 0.3);
+  border-radius: 20px;
+  padding: 2px 8px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+
+/* ══════════════════════════════════════════════════════
+   RESPONSIVE — TABLETTE
+══════════════════════════════════════════════════════ */
+
+@media (max-width: 900px) {
+  .voyages-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+  }
+}
+
+
+/* ══════════════════════════════════════════════════════
+   RESPONSIVE — MOBILE
+══════════════════════════════════════════════════════ */
+
+@media (max-width: 680px) {
+
+  .voyages-header {
+    padding: 0 24px 48px;
+  }
+
+  .map-section {
+    padding: 0 24px;
+    margin-bottom: 48px;
+  }
+
+  .map-label-hint {
+    display: none;
+  }
+
+  .voyages-grid-section {
+    padding: 0 24px;
+  }
+
+  .voyages-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  /* Sur mobile : contrôles carrousel toujours visibles */
+  .carousel-controls {
+    opacity: 1;
+  }
+}

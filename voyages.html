@@ -8,49 +8,142 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/voyages.css">
 </head>
-<body>
+<body class="page-voyages">
 
-  <nav id="navbar">
-    <div class="nav-left" id="nav-left">
-      <a href="voyages.html" class="nav-link">Voyages</a>
+  <!-- ══════════════════════════════════════════════
+       NAVBAR — identique à index.html
+       Sur cette page : directement visible (pas de hero screen)
+  ══════════════════════════════════════════════ -->
+  <nav id="navbar" class="scrolled">
+
+    <div class="nav-left visible" id="nav-left">
+      <a href="index.html#voyages" class="nav-link nav-link--active">Voyages</a>
       <span class="nav-sep">|</span>
-      <a href="photo.html" class="nav-link">Photo</a>
+      <a href="index.html#photo" class="nav-link">Photo</a>
       <span class="nav-sep">|</span>
-      <a href="impression3d.html" class="nav-link">Impression 3d</a>
+      <a href="index.html#impression3d" class="nav-link">Impression 3d</a>
     </div>
 
-    <a class="nav-logo" id="site-logo" href="index.html">steve.bru</a>
+    <!-- Logo cliquable → retour index.html -->
+    <a href="index.html" class="nav-logo" id="site-logo">steve.bru</a>
 
-    <div class="nav-right" id="nav-right">
+    <div class="nav-right visible" id="nav-right">
       <a href="index.html#contact" class="nav-link">Contact</a>
       <a href="#" class="nav-link nav-more">···</a>
     </div>
 
-    <button class="hamburger" id="hamburger" aria-label="Menu">
+    <!-- Mobile uniquement -->
+    <button class="hamburger visible" id="hamburger" aria-label="Menu">
       <span></span><span></span><span></span>
     </button>
   </nav>
 
+  <!-- Menu mobile plein écran -->
   <div class="mobile-menu" id="mobile-menu">
     <button class="mobile-menu-close" id="mobile-close">✕</button>
     <nav class="mobile-nav">
-      <a href="voyages.html" class="mobile-link">Voyages</a>
-      <a href="photo.html" class="mobile-link">Photo</a>
-      <a href="impression3d.html" class="mobile-link">3D</a>
+      <a href="index.html#voyages" class="mobile-link">Voyages</a>
+      <a href="index.html#photo" class="mobile-link">Photo</a>
+      <a href="index.html#impression3d" class="mobile-link">3D</a>
       <div class="mobile-divider"></div>
       <a href="index.html#contact" class="mobile-link mobile-link--secondary">Contact</a>
     </nav>
   </div>
 
-  <main id="main-content">
-    <!-- Contenu de la page ici -->
+
+  <!-- ══════════════════════════════════════════════
+       CONTENU PRINCIPAL
+  ══════════════════════════════════════════════ -->
+  <main id="voyages-content">
+
+    <!-- ── EN-TÊTE DE PAGE ── -->
+    <header class="voyages-header">
+      <p class="section-label">Explorations</p>
+      <h1 class="voyages-title">Voyages</h1>
+      <p class="voyages-intro">
+        35 voyages. 20 pays. Depuis 2010, chaque destination laisse une empreinte —
+        des fjords norvégiens aux savanes tanzaniennes, de l'Arctique à la Nouvelle-Zélande.
+      </p>
+
+      <!-- Statistiques globales -->
+      <div class="voyages-stats">
+        <div class="stat-item">
+          <span class="stat-number">35</span>
+          <span class="stat-label">Voyages</span>
+        </div>
+        <div class="stat-sep">·</div>
+        <div class="stat-item">
+          <span class="stat-number">20</span>
+          <span class="stat-label">Pays</span>
+        </div>
+        <div class="stat-sep">·</div>
+        <div class="stat-item">
+          <span class="stat-number">2010</span>
+          <span class="stat-label">Depuis</span>
+        </div>
+      </div>
+    </header>
+
+
+    <!-- ══════════════════════════════════════════════
+         CARTE INTERACTIVE D3.js
+         Points par pays · clic → pop-up avec liste des voyages
+         Pop-up → scroll vers la carte du voyage dans la grille
+    ══════════════════════════════════════════════ -->
+    <section class="map-section" id="map-section">
+      <div class="map-label">
+        <span>Destinations</span>
+        <span class="map-label-hint">Cliquez sur un point pour explorer</span>
+      </div>
+
+      <!-- Conteneur SVG — D3 dessine ici -->
+      <div id="world-map" role="img" aria-label="Carte mondiale des voyages de steve.bru"></div>
+
+      <!-- Pop-up carte — positionnée par JS -->
+      <div class="map-popup" id="map-popup" aria-live="polite">
+        <div class="map-popup-flag" id="popup-flag"></div>
+        <div class="map-popup-country" id="popup-country"></div>
+        <ul class="map-popup-trips" id="popup-trips"></ul>
+      </div>
+    </section>
+
+
+    <!-- ══════════════════════════════════════════════
+         GRILLE DES VOYAGES
+         Une carte par pays (regroupés si plusieurs voyages)
+         Carrousel de 1-5 photos par carte
+         Clic sur une photo → page dédiée du voyage
+    ══════════════════════════════════════════════ -->
+    <section class="voyages-grid-section" id="voyages-grid">
+      <div class="voyages-grid" id="voyages-grid-container">
+
+        <!-- ── Les cartes sont générées par JS depuis VOYAGES_DATA ── -->
+        <!-- Voir voyages.js : fonction renderVoyagesGrid() -->
+
+      </div>
+    </section>
+
   </main>
 
+
+  <!-- ── FOOTER ── -->
   <footer id="site-footer">
     <span>© 2026 steve.bru</span>
   </footer>
 
-  <script src="js/main.js"></script>
+
+  <!-- ══════════════════════════════════════════════
+       SCRIPTS
+       Ordre important :
+       1. D3.js      → librairie carte
+       2. TopoJSON   → données géographiques (format compressé)
+       3. voyages.js → logique spécifique à cette page
+  ══════════════════════════════════════════════ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+  <script src="js/voyages.js"></script>
+
 </body>
 </html>
