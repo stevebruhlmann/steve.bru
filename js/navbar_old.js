@@ -33,16 +33,6 @@ async function loadNavbar() {
       }
     });
 
-    /* ── Sur les pages secondaires : navbar visible immédiatement ── */
-    /* Sur index.html, c'est main.js qui gère l'animation et ajoute    */
-    /* les classes visible/scrolled. Sur les autres pages, on les      */
-    /* applique directement ici sans animation.                         */
-    const navbar = document.getElementById('navbar');
-    if (navbar) navbar.classList.add('scrolled');
-    document.querySelectorAll('.nav-left, .nav-right').forEach(el => {
-      el.classList.add('visible');
-    });
-
     /* ── Initialisation du menu mobile ── */
     /* Après injection, les éléments existent dans le DOM */
     initMobileMenu();

@@ -12,46 +12,10 @@
 </head>
 <body class="page-secondary">
 
-  <!-- ══════════════════════════════════════════════
-       NAVBAR
+   <!-- ══════════════════════════════════════════════
+       NAVBAR - chargée via fetch() depuis components/navbar.html
   ══════════════════════════════════════════════ -->
-
-
-  <nav id="navbar" class="scrolled">
-    <div class="nav-left" id="nav-left">
-      <a href="voyages.html" class="nav-link">Voyages</a>
-      <span class="nav-sep">|</span>
-      <a href="photo.html" class="nav-link">Photo</a>
-      <span class="nav-sep">|</span>
-      <a href="impression3d.html" class="nav-link">Impression 3d</a>
-    </div>
-
-    <!-- Logo cliquable → retour index.html -->
-    <a href="index.html" class="nav-logo" id="site-logo">steve.bru</a>
-
-    <div class="nav-right visible" id="nav-right">
-      <a href="index.html#contact" class="nav-link">Contact</a>
-      <a href="#" class="nav-link nav-more">···</a>
-    </div>
-
-    <!-- Mobile uniquement -->
-    <button class="hamburger visible" id="hamburger" aria-label="Menu">
-      <span></span><span></span><span></span>
-    </button>
-  </nav>
-
-  <!-- Menu mobile plein écran -->
-  <div class="mobile-menu" id="mobile-menu">
-    <button class="mobile-menu-close" id="mobile-close">✕</button>
-    <nav class="mobile-nav">
-      <a href="voyages.html" class="mobile-link">Voyages</a>
-      <a href="photo.html" class="mobile-link">Photo</a>
-      <a href="impression3d.html" class="mobile-link">3D</a>
-      <div class="mobile-divider"></div>
-      <a href="index.html#contact" class="mobile-link mobile-link--secondary">Contact</a>
-    </nav>
-  </div>
-
+<div id="navbar-container"></div>
 
   <!-- ══════════════════════════════════════════════
        CONTENU PRINCIPAL
@@ -80,7 +44,7 @@
     <span>© 2026 steve.bru</span>
   </footer>
 
-  <script src="js/page.js"></script>
+  <script src="/js/navbar.js"></script>
 
 </body>
 </html>
