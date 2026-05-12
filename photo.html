@@ -3,15 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Voyages — steve.bru</title>
+  <title>Photo — steve.bru</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/page.css">
 </head>
-<body>
+<body class="page-secondary">
 
-  <nav id="navbar">
+  <!-- ══════════════════════════════════════════════
+       NAVBAR
+  ══════════════════════════════════════════════ -->
+
+
+  <nav id="navbar" class="scrolled">
     <div class="nav-left" id="nav-left">
       <a href="voyages.html" class="nav-link">Voyages</a>
       <span class="nav-sep">|</span>
@@ -20,18 +26,21 @@
       <a href="impression3d.html" class="nav-link">Impression 3d</a>
     </div>
 
-    <a class="nav-logo" id="site-logo" href="index.html">steve.bru</a>
+    <!-- Logo cliquable → retour index.html -->
+    <a href="index.html" class="nav-logo" id="site-logo">steve.bru</a>
 
-    <div class="nav-right" id="nav-right">
+    <div class="nav-right visible" id="nav-right">
       <a href="index.html#contact" class="nav-link">Contact</a>
       <a href="#" class="nav-link nav-more">···</a>
     </div>
 
-    <button class="hamburger" id="hamburger" aria-label="Menu">
+    <!-- Mobile uniquement -->
+    <button class="hamburger visible" id="hamburger" aria-label="Menu">
       <span></span><span></span><span></span>
     </button>
   </nav>
 
+  <!-- Menu mobile plein écran -->
   <div class="mobile-menu" id="mobile-menu">
     <button class="mobile-menu-close" id="mobile-close">✕</button>
     <nav class="mobile-nav">
@@ -43,14 +52,35 @@
     </nav>
   </div>
 
-  <main id="main-content">
-    <!-- Contenu de la page ici -->
+
+  <!-- ══════════════════════════════════════════════
+       CONTENU PRINCIPAL
+  ══════════════════════════════════════════════ -->
+  <main id="page-content">
+
+    <!-- ── EN-TÊTE DE PAGE ── -->
+    <header class="voyages-header">
+      <p class="section-label">Univers</p>
+      <h1 class="section-title">Photographie</h1>
+      <p class="voyages-intro">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
+        incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
+        exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
+        dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+      </p>
+    </header>
+
+    <!-- ── CONTENU À VENIR ── -->
+
   </main>
 
+
+  <!-- ── FOOTER ── -->
   <footer id="site-footer">
     <span>© 2026 steve.bru</span>
   </footer>
 
-  <script src="js/main.js"></script>
+  <script src="js/page.js"></script>
+
 </body>
 </html>

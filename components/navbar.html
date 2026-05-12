@@ -1,0 +1,51 @@
+<!-- ══════════════════════════════════════════════════════
+     steve.bru — components/navbar.html
+     Navbar commune à toutes les pages du site.
+     Chargée via fetch() par js/navbar.js
+
+     Note : sur index.html, le logo est animé (hero screen)
+     et le #nav-logo-placeholder est géré par main.js.
+     Sur les pages secondaires, page.css positionne le logo
+     directement via .page-secondary #site-logo.
+══════════════════════════════════════════════════════ -->
+
+<nav id="navbar">
+
+  <div class="nav-left" id="nav-left">
+    <a href="voyages.html" class="nav-link" data-page="voyages">Voyages</a>
+    <span class="nav-sep">|</span>
+    <a href="photo.html" class="nav-link" data-page="photo">Photo</a>
+    <span class="nav-sep">|</span>
+    <a href="impression3d.html" class="nav-link" data-page="impression3d">Impression 3d</a>
+  </div>
+
+  <!-- Placeholder invisible — réserve la place du logo dans le flux flex -->
+  <!-- Utilisé sur index.html pour l'animation hero, ignoré sur les autres pages -->
+  <div id="nav-logo-placeholder">steve.bru</div>
+
+  <!-- Logo cliquable → retour index.html -->
+  <a href="index.html" class="nav-logo" id="site-logo">steve.bru</a>
+
+  <div class="nav-right" id="nav-right">
+    <a href="index.html#contact" class="nav-link" data-page="contact">Contact</a>
+    <a href="#" class="nav-link nav-more">···</a>
+  </div>
+
+  <!-- Hamburger : affiché sur mobile -->
+  <button class="hamburger" id="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+
+</nav>
+
+<!-- Menu mobile plein écran -->
+<div class="mobile-menu" id="mobile-menu">
+  <button class="mobile-menu-close" id="mobile-close">✕</button>
+  <nav class="mobile-nav">
+    <a href="voyages.html" class="mobile-link">Voyages</a>
+    <a href="photo.html" class="mobile-link">Photo</a>
+    <a href="impression3d.html" class="mobile-link">3D</a>
+    <div class="mobile-divider"></div>
+    <a href="index.html#contact" class="mobile-link mobile-link--secondary">Contact</a>
+  </nav>
+</div>

@@ -10,74 +10,31 @@ if ('scrollRestoration' in history) {
 }
 window.scrollTo(0, 0);
 
+// Pour empêcher la page de scroller au premier scroll permettant au titre steve.bru de se ranger dans la navbar
+// document.body.style.overflow = 'hidden';
+// document.body.style.touchAction = 'none';
 document.addEventListener('navbar-ready', () => {
-
   // ══════════════════════════════════════════════════════
   // ÉLÉMENTS DOM
   // Récupération de tous les éléments HTML dont on a besoin.
   // ══════════════════════════════════════════════════════
 
-  const logo           = document.getElementById('site-logo');
-  const heroScreen     = document.getElementById('hero-screen');
-  const scrollHint     = document.getElementById('scroll-hint');
-  const navbar         = document.getElementById('navbar');
-  const navLeft        = document.getElementById('nav-left');
-  const navRight       = document.getElementById('nav-right');
+  const logo        = document.getElementById('site-logo');
+  const heroScreen  = document.getElementById('hero-screen');
+  const scrollHint  = document.getElementById('scroll-hint');
+  const navbar      = document.getElementById('navbar');
+  const navLeft     = document.getElementById('nav-left');
+  const navRight    = document.getElementById('nav-right');
   const navPlaceholder = document.getElementById('nav-logo-placeholder');
-  const hamburger      = document.getElementById('hamburger');
-  const mobileMenu     = document.getElementById('mobile-menu');
-  const mobileClose    = document.getElementById('mobile-close');
-  const mainContent    = document.getElementById('main-content');
+  const hamburger   = document.getElementById('hamburger');
+  const mobileMenu  = document.getElementById('mobile-menu');
+  const mobileClose = document.getElementById('mobile-close');
+  const mainContent = document.getElementById('main-content');
 
   // triggered : devient true une fois l'animation intro jouée, pour ne pas la rejouer
   // menuOpen  : état du menu mobile (ouvert/fermé)
   let triggered = false;
   let menuOpen  = false;
-
-
-  // ══════════════════════════════════════════════════════
-  // NAVBAR RESPONSIVE — 3 états automatiques
-  //
-  // Le logo est toujours position:fixed, jamais dans le flux.
-  // Le placeholder (#nav-logo-placeholder) occupe sa place
-  // dans le flexbox et permet des calculs de position fiables.
-  //
-  // État 1 — Normal  : tout tient sur une ligne
-  // État 2 — Stacked : nav-left chevauche le placeholder
-  //                    → liens passent sur la ligne du dessous
-  // État 3 — Compact : même en stacked ça ne tient plus
-  //                    → hamburger uniquement
-  //
-  // Définie ici en premier car appelée dans le bloc alreadySeen ci-dessous.
-  // ══════════════════════════════════════════════════════
-
-  function checkNavOverflow() {
-    if (!navLeft.classList.contains('visible')) return;
-
-    // Réinitialise pour mesurer en état normal
-    navbar.classList.remove('stacked', 'compact');
-
-    const leftRect  = navLeft.getBoundingClientRect();
-    const rightRect = navRight.getBoundingClientRect();
-    const logoRect  = logo.getBoundingClientRect();
-
-    // Chevauchement : nav-left empiète sur le logo, ou nav-right empiète sur le logo
-    const overlapLeft  = leftRect.right  > logoRect.left;
-    const overlapRight = rightRect.left  < logoRect.right;
-
-    if (overlapLeft || overlapRight) {
-      navbar.classList.add('stacked');
-
-      const neededStacked = navLeft.scrollWidth + navRight.scrollWidth + 80;
-      if (neededStacked > navbar.getBoundingClientRect().width) {
-        navbar.classList.remove('stacked');
-        navbar.classList.add('compact');
-      }
-    }
-  }
-
-  // Appel à chaque resize de fenêtre
-  window.addEventListener('resize', checkNavOverflow, { passive: true });
 
 
   // ══════════════════════════════════════════════════════
@@ -115,6 +72,7 @@ document.addEventListener('navbar-ready', () => {
     scrollHint.classList.add('hidden');
     heroScreen.classList.add('triggered');
     logo.classList.add('in-nav');
+    // mainContent.classList.add('revealed');
 
     // Délai 320ms : laisse le temps au logo de commencer son animation
     // avant de faire apparaître la navbar et le contenu
@@ -125,6 +83,7 @@ document.addEventListener('navbar-ready', () => {
       hamburger.classList.add('visible');
       logo.style.cursor = 'pointer';
       mainContent.classList.add('revealed');
+      // On vérifie le responsive après que les éléments soient visibles
       checkNavOverflow();
     }, 320);
 
@@ -132,6 +91,10 @@ document.addEventListener('navbar-ready', () => {
     // pour qu'il ne bloque plus les interactions
     setTimeout(() => {
       heroScreen.classList.add('done');
+
+      // Pour empêcher la page de scroller au premier scroll permettant au titre steve.bru de se ranger dans la navbar
+      // document.body.style.overflow = '';
+      // document.body.style.touchAction = '';
     }, 500);
   }
 
@@ -165,6 +128,57 @@ document.addEventListener('navbar-ready', () => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   });
+
+
+  // ══════════════════════════════════════════════════════
+  // NAVBAR RESPONSIVE — 3 états automatiques
+  //
+  // Le logo est toujours position:fixed, jamais dans le flux.
+  // Le placeholder (#nav-logo-placeholder) occupe sa place
+  // dans le flexbox et permet des calculs de position fiables.
+  //
+  // État 1 — Normal  : tout tient sur une ligne
+  // État 2 — Stacked : nav-left chevauche le placeholder
+  //                    → liens passent sur la ligne du dessous
+  // État 3 — Compact : même en stacked ça ne tient plus
+  //                    → hamburger uniquement
+  //
+  // On compare les positions réelles du placeholder et de
+  // nav-left pour détecter le chevauchement.
+  // ══════════════════════════════════════════════════════
+
+  function checkNavOverflow() {
+    if (!navLeft.classList.contains('visible')) return;
+
+    // Réinitialise pour mesurer en état normal
+    navbar.classList.remove('stacked', 'compact');
+
+    // Maintenant on mesure les positions réelles
+    const leftRect  = navLeft.getBoundingClientRect();
+    const rightRect = navRight.getBoundingClientRect();
+    const logoRect  = logo.getBoundingClientRect();
+
+    // Chevauchement : nav-left empiète sur le logo, ou nav-right empiète sur le logo
+    const overlapLeft  = leftRect.right  > logoRect.left;
+    const overlapRight = rightRect.left < logoRect.right;
+
+    if (overlapLeft || overlapRight) {
+      navbar.classList.add('stacked');
+
+      // En stacked, vérifie si nav-left et nav-right tiennent sur une ligne
+      const stackedLeftRect  = navLeft.getBoundingClientRect();
+      const stackedRightRect = navRight.getBoundingClientRect();
+
+      const neededStacked = navLeft.scrollWidth + navRight.scrollWidth + 80;
+      if (neededStacked > navbar.getBoundingClientRect().width) {
+        navbar.classList.remove('stacked');
+        navbar.classList.add('compact');
+      }
+    }
+  }
+
+  // Appel à chaque resize de fenêtre
+  window.addEventListener('resize', checkNavOverflow, { passive: true });
 
 
   // ══════════════════════════════════════════════════════
@@ -222,7 +236,10 @@ document.addEventListener('navbar-ready', () => {
   // Sur desktop (périphérique avec pointeur précis) :
   //   - Survol d'une section → elle est à pleine luminosité,
   //     les autres sont légèrement assombries (classe 'dim')
-  // Sur mobile (tactile) : aucun effet.
+  //   - Quand la souris quitte une section, on garde la
+  //     dernière survolée active jusqu'au prochain survol
+  // Sur mobile (tactile) : aucun effet, toutes les sections
+  //   restent à pleine luminosité.
   // matchMedia('(pointer: fine)') détecte un pointeur précis
   //   (souris), par opposition à 'coarse' (doigt tactile).
   // ══════════════════════════════════════════════════════
@@ -230,12 +247,48 @@ document.addEventListener('navbar-ready', () => {
   const sections = document.querySelectorAll('.section');
 
   if (window.matchMedia('(pointer: fine)').matches) {
+    // Desktop uniquement
     sections.forEach(section => {
       section.addEventListener('mouseenter', () => {
+        // Assombrit toutes les sections, puis illumine celle survolée
         sections.forEach(s => s.classList.add('dim'));
         section.classList.remove('dim');
       });
     });
   }
 
+  // ── Scroll spy : ancienne version commentée pour référence ──
+
+  // const sections = document.querySelectorAll('.section');
+
+  // function setActive(activeSection) {
+  //   sections.forEach(s => s.classList.add('dim'));
+  //   activeSection.classList.remove('dim');
+  //   document.querySelectorAll('.nav-link').forEach(link => {
+  //     link.classList.remove('active');
+  //     if (link.getAttribute('href') === '#' + activeSection.id) {
+  //       link.classList.add('active');
+  //     }
+  //   });
+  // }
+
+  // function updateActiveSection() {
+  //   const atTop    = window.scrollY < 150;
+  //   const atBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 50;
+
+  //   if (atTop)    { setActive(sections[0]);                    return; }
+  //   if (atBottom) { setActive(sections[sections.length - 1]); return; }
+
+  //   const middle = window.innerHeight / 2;
+  //   sections.forEach(section => {
+  //     const rect = section.getBoundingClientRect();
+  //     if (rect.top <= middle && rect.bottom >= middle) {
+  //       setActive(section);
+  //     }
+  //   });
+  // }
+
+  // // Initialisation : première section active au chargement
+  // setActive(sections[0]);
+  // window.addEventListener('scroll', updateActiveSection, { passive: true });
 });

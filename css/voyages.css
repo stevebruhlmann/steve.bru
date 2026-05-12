@@ -21,62 +21,9 @@
    CONTENU PRINCIPAL
 ══════════════════════════════════════════════════════ */
 
-#voyages-content {
+#page-content {
   padding-top: calc(var(--nav-h) + 48px);
   padding-bottom: 120px;
-}
-
-
-/* ══════════════════════════════════════════════════════
-   EN-TÊTE DE PAGE
-══════════════════════════════════════════════════════ */
-
-.voyages-header {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 0 40px 64px;
-}
-
-.voyages-intro {
-  font-size: 1rem;
-  line-height: 1.75;
-  color: var(--muted);
-  max-width: 800px;
-  margin-bottom: 40px;
-}
-
-/* Statistiques globales */
-.voyages-stats {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.stat-item {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.stat-number {
-  font-family: var(--font-display);
-  font-size: 2rem;
-  font-weight: 300;
-  color: var(--accent);
-  line-height: 1;
-}
-
-.stat-label {
-  font-size: 0.65rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-.stat-sep {
-  color: var(--border);
-  font-size: 1.4rem;
-  padding-bottom: 16px;
 }
 
 
