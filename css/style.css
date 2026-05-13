@@ -45,12 +45,13 @@ a {
 
 /* Scrollbar toujours présente, colorée comme le fond — invisible mais occupe l'espace */
 ::-webkit-scrollbar {
-  width: 60px;
+   /* Largeur de la scrollbar */
+  width: 15px;
 }
 
 /* Fond de la scrollbar */
 ::-webkit-scrollbar-track {
-  background: color-mix(in srgb, var(--bg) 60%, white 40%);
+  background: var(--bg);
   border-radius: 4px;
 }
 
