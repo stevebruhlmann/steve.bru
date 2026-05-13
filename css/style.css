@@ -58,11 +58,12 @@ a {
 /* Poignée de défilement */
 ::-webkit-scrollbar-thumb {
   background: color-mix(in srgb, var(--bg) 60%, white 40%);
+  border-radius: 4 px;
 }
 
 /* Poignée de Flèches haut/bas  */
 ::-webkit-scrollbar-button {
-  background: color-mix(in srgb, var(--bg) 60%, white 40%);
+  background: color-mix(in srgb, var(--bg) 30%, white 70%);
   height: 12px;
 }
 
