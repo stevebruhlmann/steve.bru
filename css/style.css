@@ -37,6 +37,7 @@ body {
   line-height: 1.6;
   /* overflow-x: hidden; */
   scrollbar-gutter: stable;
+  overflow-y: scroll;
 
   /* Pour empêcher la page de scroller au premier scroll permettant au titre steve.bru de se ranger dans la navbar */
   /* overscroll-behavior: none; */
