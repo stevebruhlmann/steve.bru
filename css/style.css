@@ -35,7 +35,7 @@ body {
   font-family: var(--font-body);
   font-weight: 300;
   line-height: 1.6;
-  overflow-x: hidden;
+  /* overflow-x: hidden; */
   scrollbar-gutter: stable;
 
   /* Pour empêcher la page de scroller au premier scroll permettant au titre steve.bru de se ranger dans la navbar */
