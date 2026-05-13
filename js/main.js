@@ -132,6 +132,7 @@ document.addEventListener('navbar-ready', () => {
     // pour qu'il ne bloque plus les interactions
     setTimeout(() => {
       heroScreen.classList.add('done');
+      document.documentElement.style.overflow = 'auto'; /* Cache la scrollbar durant l'animation initiale à l'arrivée sur index.html */
     }, 500);
   }
 
