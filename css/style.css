@@ -35,12 +35,25 @@ body {
   font-family: var(--font-body);
   font-weight: 300;
   line-height: 1.6;
-  scrollbar-gutter: stable;
+  overflow-y: scroll
 }
 
 a {
   color: inherit;
   text-decoration: none;
+}
+
+/* Scrollbar toujours présente, colorée comme le fond — invisible mais occupe l'espace */
+::-webkit-scrollbar {
+  width: 15px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--bg);
 }
 
 
