@@ -45,20 +45,22 @@ a {
 
 /* Scrollbar toujours présente, colorée comme le fond — invisible mais occupe l'espace */
 ::-webkit-scrollbar {
-  width: 15px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg);
+  background: color-mix(in srgb, var(--bg) 60%, white 40%);
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
   background: color-mix(in srgb, var(--bg) 60%, white 40%);
 }
 
-/* ::-webkit-scrollbar-button {
-  display: none;
-} */
+::-webkit-scrollbar-button {
+  background: color-mix(in srgb, var(--bg) 60%, white 40%);
+  height: 12px;
+}
 
 
 /* ══════════════════════════════════════════════════════
