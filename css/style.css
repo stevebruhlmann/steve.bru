@@ -50,16 +50,16 @@ a {
 }
 
 /* Fond de la scrollbar */
-::-webkit-scrollbar-track {
+/*::-webkit-scrollbar-track {
   background: var(--bg);
   border-radius: 4px;
-}
+}*/
 
 /* Poignée de défilement */
-::-webkit-scrollbar-thumb {
+/*::-webkit-scrollbar-thumb {
   background: color-mix(in srgb, var(--bg) 60%, white 40%);
   border-radius: 4 px;
-}
+}*/
 
 /* Poignée de Flèches haut/bas  */
 /*::-webkit-scrollbar-button {
