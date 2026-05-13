@@ -46,7 +46,7 @@ a {
 /* Scrollbar toujours présente, colorée comme le fond — invisible mais occupe l'espace */
 ::-webkit-scrollbar {
    /* Largeur de la scrollbar */
-  width: 15px;
+  width: 10px;
 }
 
 /* Fond de la scrollbar */
