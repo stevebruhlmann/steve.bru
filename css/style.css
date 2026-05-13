@@ -45,18 +45,21 @@ a {
 
 /* Scrollbar toujours présente, colorée comme le fond — invisible mais occupe l'espace */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 60px;
 }
 
+/* Fond de la scrollbar */
 ::-webkit-scrollbar-track {
   background: color-mix(in srgb, var(--bg) 60%, white 40%);
   border-radius: 4px;
 }
 
+/* Poignée de défilement */
 ::-webkit-scrollbar-thumb {
   background: color-mix(in srgb, var(--bg) 60%, white 40%);
 }
 
+/* Poignée de Flèches haut/bas  */
 ::-webkit-scrollbar-button {
   background: color-mix(in srgb, var(--bg) 60%, white 40%);
   height: 12px;
