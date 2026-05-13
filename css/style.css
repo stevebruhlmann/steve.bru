@@ -28,6 +28,7 @@ html {
   scroll-behavior: smooth;
   scroll-padding-top: var(--nav-h);
   overflow: hidden; /* Cache temporairement la scrollbar durant l'animation initiale sur l'arrivée sur index.html */
+  scrollbar-gutter: stable;
 }
 
 body {
