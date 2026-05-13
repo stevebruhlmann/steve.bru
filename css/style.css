@@ -62,10 +62,10 @@ a {
 }
 
 /* Poignée de Flèches haut/bas  */
-::-webkit-scrollbar-button {
+/*::-webkit-scrollbar-button {
   background: color-mix(in srgb, var(--bg) 30%, white 70%);
   height: 12px;
-}
+}*/
 
 
 /* ══════════════════════════════════════════════════════
