@@ -14,7 +14,7 @@ async function loadNavbar() {
 
   try {
     /* ── Chargement du fichier navbar.html ── */
-    const response = await fetch('/components/navbar.html');
+    const response = await fetch('components/navbar.html');
     if (!response.ok) throw new Error('Navbar introuvable');
     const html = await response.text();
 
