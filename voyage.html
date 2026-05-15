@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Titre dynamique : mis à jour par voyage.js selon l'id dans l'URL -->
+  <title>Voyage – steve.bru</title>
+
+  <!-- Polices (identiques au reste du site) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+
+  <!-- Styles globaux du site -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- Styles communs pages secondaires (navbar fix, fil d'Ariane...) -->
+  <link rel="stylesheet" href="css/page.css">
+
+  <!-- Styles spécifiques à la page voyage (galerie, lightbox) -->
+  <link rel="stylesheet" href="css/voyage.css">
+</head>
+
+<body class="page-secondary">
+
+  <!-- Navbar centralisée — injectée par navbar.js via fetch() -->
+  <div id="navbar-container"></div>
+
+  <!-- ══════════════════════════════════════════════════════
+       CONTENU PRINCIPAL
+       Tout est généré dynamiquement par voyage.js
+       selon l'id passé dans l'URL : voyage.html?id=tanzanie-2024
+  ══════════════════════════════════════════════════════ -->
+  <main id="page-content">
+
+    <!-- En-tête du voyage (titre, pays, date, intro) -->
+    <div id="voyage-header"></div>
+
+    <!-- Galerie masonry de toutes les photos du voyage -->
+    <div id="voyage-galerie"></div>
+
+  </main>
+
+  <!-- ══════════════════════════════════════════════════════
+       LIGHTBOX — superposition plein écran au clic d'une photo
+  ══════════════════════════════════════════════════════ -->
+  <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="Photo en plein écran">
+    <div class="lightbox__backdrop" id="lightbox-backdrop"></div>
+    <div class="lightbox__frame">
+      <button class="lightbox__close" id="lightbox-close" aria-label="Fermer">×</button>
+      <img class="lightbox__img" id="lightbox-img" src="" alt="">
+      <button class="lightbox__nav lightbox__nav--prev" id="lightbox-prev" aria-label="Photo précédente">‹</button>
+      <button class="lightbox__nav lightbox__nav--next" id="lightbox-next" aria-label="Photo suivante">›</button>
+      <div class="lightbox__counter" id="lightbox-counter"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       SCRIPTS — ordre important :
+         1. navbar.js   → navbar + fil d'Ariane
+         2. voyages.js  → définit VOYAGES_DATA (source unique)
+         3. voyage.js   → lit VOYAGES_DATA + rendu + lightbox
+
+       voyages.js est chargé ici SANS initialiser la carte D3
+       (initMap et renderVoyagesGrid ne s'exécutent que sur
+       voyages.html via DOMContentLoaded — aucun effet ici)
+  ══════════════════════════════════════════════════════ -->
+  <script src="js/navbar.js"></script>
+  <script src="js/voyages.js"></script>
+  <script src="js/voyage.js"></script>
+
+</body>
+</html>

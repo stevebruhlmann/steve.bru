@@ -6,7 +6,7 @@
 
 /* ── VARIABLES ── */
 :root {
-  --bg:           #12110f;
+  --bg:           #12110f; /* #1a1917 plus clair, peut aller */
   --border:       rgba(255,255,255,0.12);
   --accent:       #4a9a8e;
   --text:         #f5f4f0;
@@ -87,6 +87,7 @@ a {
   justify-content: center;
   pointer-events: none;
   transition: opacity 0.3s ease, visibility 0.3s ease;
+
 }
 
 #hero-screen.done {
