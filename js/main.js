@@ -111,16 +111,16 @@ document.addEventListener('navbar-ready', () => {
   function triggerReveal() {
     if (triggered) return;
     triggered = true;
-
     sessionStorage.setItem('hero-seen', '1');
 
     scrollHint.classList.add('hidden');
-    heroScreen.classList.add('triggered');
+
+    /* 1. Fade out du logo central */
     logo.classList.add('in-nav');
 
-    // Délai 320ms : laisse le temps au logo de commencer son animation
-    // avant de faire apparaître la navbar et le contenu
+    /* 2. Après le fondu du logo (550ms) → apparition navbar + contenu */
     setTimeout(() => {
+      heroScreen.classList.add('triggered');
       navbar.classList.add('scrolled');
       navLeft.classList.add('visible');
       navRight.classList.add('visible');
@@ -128,14 +128,13 @@ document.addEventListener('navbar-ready', () => {
       logo.style.cursor = 'pointer';
       mainContent.classList.add('revealed');
       checkNavOverflow();
-    }, 320);
+    }, 550);
 
-    // Délai 500ms : masque complètement le hero-screen une fois l'animation terminée
-    // pour qu'il ne bloque plus les interactions
+    /* 3. Masque le hero-screen une fois tout terminé */
     setTimeout(() => {
       heroScreen.classList.add('done');
-      document.documentElement.style.overflow = 'auto'; /* Cache la scrollbar durant l'animation initiale à l'arrivée sur index.html */
-    }, 500);
+      document.documentElement.style.overflow = 'auto';
+    }, 900);
   }
 
   // Rangement automatique après 2500ms si l'utilisateur ne scrolle pas
