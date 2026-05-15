@@ -88,8 +88,9 @@ document.addEventListener('navbar-ready', () => {
   // ══════════════════════════════════════════════════════
 
   const alreadySeen = sessionStorage.getItem('hero-seen');
+  const visitedSite  = sessionStorage.getItem('visited-site');
 
-  if (alreadySeen) {
+  if (alreadySeen || visitedSite) {
     // Session déjà vue — état final appliqué directement, sans animation
     triggered = true;
     logo.classList.add('in-nav');
@@ -102,6 +103,7 @@ document.addEventListener('navbar-ready', () => {
     scrollHint.classList.add('hidden');
     mainContent.classList.add('revealed');
     checkNavOverflow();
+    document.documentElement.style.overflow = 'auto';
   }
 
   // triggerReveal : joue l'animation de rangement du logo dans la navbar,

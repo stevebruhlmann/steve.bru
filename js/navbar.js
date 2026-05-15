@@ -47,6 +47,28 @@ async function loadNavbar() {
       document.querySelectorAll('.nav-left, .nav-right').forEach(el => {
         el.classList.add('visible');
       });
+      sessionStorage.setItem('visited-site', '1'); /* Pour le pas mettre l'animation si on arrive sur indes.html pour la première fois via une autre page du site */
+    }
+
+    /* ── Fil d'Ariane — généré dynamiquement selon la page ── */
+    const breadcrumbMap = {
+      'voyages':      'Voyages',
+      'photo':        'Photographie',
+      'impression3d': 'Impression 3D'
+    };
+
+    if (!isIndex && breadcrumbMap[filename]) {
+      const breadcrumb = document.createElement('nav');
+      breadcrumb.className = 'breadcrumb';
+      breadcrumb.innerHTML = `
+        <a href="index.html" class="breadcrumb-home">Accueil</a>
+        <span class="breadcrumb-sep">›</span>
+        <span class="breadcrumb-current">${breadcrumbMap[filename]}</span>
+      `;
+
+      /* Insère le fil d'Ariane avant le premier élément du contenu principal */
+      const pageContent = document.getElementById('page-content');
+      if (pageContent) pageContent.insertBefore(breadcrumb, pageContent.firstChild);
     }
 
     /* ── Initialisation du menu mobile ── */

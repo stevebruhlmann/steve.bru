@@ -110,3 +110,42 @@
     padding: 0 24px 48px;
   }
 }
+
+
+/* ══════════════════════════════════════════════════════
+   FIL D'ARIANE (breadcrumb)
+══════════════════════════════════════════════════════ */
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 40px 32px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.breadcrumb-home {
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+  transition: color 0.2s;
+}
+
+.breadcrumb-home:hover {
+  color: var(--accent);
+}
+
+.breadcrumb-sep {
+  color: var(--muted);
+  font-size: 0.7rem;
+  opacity: 0.4;
+}
+
+.breadcrumb-current {
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text);
+}
