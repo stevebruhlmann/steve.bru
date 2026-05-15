@@ -57,12 +57,23 @@ async function loadNavbar() {
       'impression3d': 'Impression 3D'
     };
 
+    /* Sur voyage.html, le label est le nom du pays lu depuis l'URL */
+    if (filename === 'voyage') {
+      const id = new URLSearchParams(window.location.search).get('id');
+      const data = typeof VOYAGES_DATA !== 'undefined'
+        ? VOYAGES_DATA.find(v => v.id === id)
+        : null;
+      breadcrumbMap['voyage'] = data ? data.country : 'Voyage';
+    }
+
     if (!isIndex && breadcrumbMap[filename]) {
       const breadcrumb = document.createElement('nav');
       breadcrumb.className = 'breadcrumb';
+      const isVoyageDedié = filename === 'voyage';
       breadcrumb.innerHTML = `
         <a href="index.html" class="breadcrumb-home">Accueil</a>
         <span class="breadcrumb-sep">›</span>
+        ${isVoyageDedié ? `<a href="voyages.html" class="breadcrumb-home">Voyages</a><span class="breadcrumb-sep">›</span>` : ''}
         <span class="breadcrumb-current">${breadcrumbMap[filename]}</span>
       `;
 

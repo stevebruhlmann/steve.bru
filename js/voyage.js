@@ -62,9 +62,10 @@ function renderHeader(v) {
 
   document.getElementById('voyage-header').innerHTML = `
     <div class="voyage-header">
-      <div class="voyage-num">#${v.num}</div>
-      <h1 class="voyage-title">${v.flag} ${v.country} ${badgeFutur}</h1>
+      <h1 class="voyage-title">${v.country} ${v.flag} ${badgeFutur}</h1>
       <div class="voyage-meta">
+        <span>#${v.num}</span>
+        <span class="voyage-meta__sep"></span>
         <span>${v.city}</span>
         <span class="voyage-meta__sep"></span>
         <span>${dateLabel}</span>
