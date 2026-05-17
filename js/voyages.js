@@ -1,7 +1,9 @@
 /* ══════════════════════════════════════════════════════
    steve.bru — voyages.js
    Logique de la page voyages.html :
-   · Données de tous les voyages (avec intro + page dédiée)
+   · Données de tous les voyages
+   · Calcul automatique des stats (voyages, pays, continents, km)
+   · Compteurs animés au scroll
    · Carte interactive D3.js avec zoom
    · Grille des voyages avec vignette photo aléatoire
 ══════════════════════════════════════════════════════ */
@@ -10,20 +12,21 @@
 /* ══════════════════════════════════════════════════════
    1. DONNÉES DES VOYAGES
    Champs :
-     id      → identifiant unique (utilisé dans l'URL voyage.html?id=...)
-     num     → numéro du voyage (ordre chronologique)
-     country → nom du pays affiché
-     flag    → emoji drapeau
-     city    → villes / étapes visitées
-     coords  → [longitude, latitude] pour la carte D3
-     trips   → liste des séjours (label + future?)
-     year    → année du premier voyage dans ce pays
-     month   → mois si voyage unique (null si plusieurs)
-     intro   → texte d'introduction sur la page dédiée
-     photos  → fichiers dans images/voyages/[id]/thumb/
-               (vide = placeholder drapeau affiché à la place)
-     page    → chemin de la page dédiée (voyage.html?id=...)
-     future  → true si TOUS les voyages de ce pays sont futurs
+     id        → identifiant unique (URL voyage.html?id=...)
+     num       → numéro du voyage (ordre chronologique)
+     country   → nom du pays affiché
+     flag      → emoji drapeau
+     city      → villes / étapes visitées
+     coords    → [longitude, latitude] pour la carte D3 et le calcul km
+     continent → continent pour le compteur (Europe, Amérique du Nord,
+                 Amérique du Sud, Asie, Afrique, Océanie, Antarctique)
+     trips     → liste des séjours ({ label, future? })
+     year      → année du premier voyage dans ce pays
+     month     → mois si voyage unique (null si plusieurs)
+     intro     → texte d'introduction sur la page dédiée
+     photos    → fichiers dans images/voyages/[id]/thumb/
+     page      → chemin de la page dédiée (voyage.html?id=...)
+     future    → true si TOUS les voyages de ce pays sont futurs
 ══════════════════════════════════════════════════════ */
 
 const VOYAGES_DATA = [
@@ -33,7 +36,7 @@ const VOYAGES_DATA = [
   {
     id: 'hongrie-2010',
     num: 1, country: 'Hongrie', flag: '🇭🇺', city: 'Budapest',
-    coords: [19.0, 47.5],
+    coords: [19.0, 47.5], continent: 'Europe',
     trips: [{ label: '2010' }],
     year: 2010, month: null,
     intro: 'Premier voyage en avion, premier dépaysement. Budapest avec ses bains thermaux, son architecture austro-hongroise et ses rives du Danube illuminées la nuit.',
@@ -43,7 +46,7 @@ const VOYAGES_DATA = [
   {
     id: 'finlande-2011',
     num: 2, country: 'Finlande', flag: '🇫🇮', city: 'Helsinki',
-    coords: [25.0, 60.2],
+    coords: [25.0, 60.2], continent: 'Europe',
     trips: [{ label: '2011' }, { label: 'Juil. 2022' }],
     year: 2011, month: null,
     intro: 'Helsinki en été, quand le soleil ne se couche presque pas. Une ville propre, silencieuse, avec la mer partout. Retour en 2022 avec une escapade côté suédois.',
@@ -53,7 +56,7 @@ const VOYAGES_DATA = [
   {
     id: 'irlande-2012',
     num: 3, country: 'Irlande', flag: '🇮🇪', city: 'Dublin',
-    coords: [-8.2, 53.1],
+    coords: [-8.2, 53.1], continent: 'Europe',
     trips: [{ label: '2012' }, { label: 'Nov. 2021' }],
     year: 2012, month: null,
     intro: 'Dublin et ses pubs, ses façades colorées et son sens de l\'humour. Une ville qui se vit autant qu\'elle se visite — deux fois plutôt qu\'une.',
@@ -63,7 +66,7 @@ const VOYAGES_DATA = [
   {
     id: 'espagne-2012',
     num: 4, country: 'Espagne', flag: '🇪🇸', city: 'Valence',
-    coords: [-3.7, 40.4],
+    coords: [-3.7, 40.4], continent: 'Europe',
     trips: [{ label: '2012' }, { label: 'Oct. 2024' }],
     year: 2012, month: null,
     intro: 'Barcelone d\'abord, puis Valence — l\'Espagne entre Gaudí et la Cité des Arts et des Sciences. Lumière méditerranéenne, énergie permanente.',
@@ -73,7 +76,7 @@ const VOYAGES_DATA = [
   {
     id: 'pologne-2012',
     num: 5, country: 'Pologne', flag: '🇵🇱', city: 'Varsovie',
-    coords: [21.0, 52.2],
+    coords: [21.0, 52.2], continent: 'Europe',
     trips: [{ label: '2012' }, { label: 'Juil. 2021' }],
     year: 2012, month: null,
     intro: 'Cracovie en décembre sous la neige, puis retour en été. La vieille ville préservée, le marché de Noël, et l\'ombre de l\'histoire partout.',
@@ -84,7 +87,7 @@ const VOYAGES_DATA = [
     id: 'norvege',
     num: 6, country: 'Norvège', flag: '🇳🇴',
     city: 'Stavanger · Oslo · Karmøy · Arctique',
-    coords: [10.7, 59.9],
+    coords: [10.7, 59.9], continent: 'Europe',
     trips: [
       { label: '2014' },
       { label: '2015' },
@@ -102,7 +105,7 @@ const VOYAGES_DATA = [
     id: 'portugal',
     num: 7, country: 'Portugal', flag: '🇵🇹',
     city: 'Lisbonne · Porto',
-    coords: [-9.1, 38.7],
+    coords: [-9.1, 38.7], continent: 'Europe',
     trips: [
       { label: '2014' },
       { label: 'Avr. 2017 — Lisbonne' },
@@ -118,7 +121,7 @@ const VOYAGES_DATA = [
   {
     id: 'turquie-2015',
     num: 9, country: 'Turquie', flag: '🇹🇷', city: 'Istanbul',
-    coords: [35.2, 38.9],
+    coords: [35.2, 38.9], continent: 'Europe', /* Istanbul côté européen */
     trips: [{ label: '2015' }],
     year: 2015, month: null,
     intro: 'Istanbul à la croisée de deux continents. Le Grand Bazar, Sainte-Sophie, le Bosphore au coucher du soleil. Une ville qui n\'appartient qu\'à elle-même.',
@@ -128,7 +131,7 @@ const VOYAGES_DATA = [
   {
     id: 'croatie-2018',
     num: 16, country: 'Croatie', flag: '🇭🇷', city: 'Split',
-    coords: [15.2, 45.1],
+    coords: [15.2, 45.1], continent: 'Europe',
     trips: [{ label: 'Sept. 2018' }],
     year: 2018, month: 'Sept.',
     intro: 'Split et sa vieille ville construite dans le palais de Dioclétien. La mer adriatique, les îles au loin, et une douceur de vivre méditerranéenne.',
@@ -138,7 +141,7 @@ const VOYAGES_DATA = [
   {
     id: 'islande-2019',
     num: 18, country: 'Islande', flag: '🇮🇸', city: 'Reykjavik',
-    coords: [-19.0, 64.9],
+    coords: [-19.0, 64.9], continent: 'Europe',
     trips: [{ label: 'Juil. 2019' }],
     year: 2019, month: 'Juil.',
     intro: 'L\'Islande — une île au bout du monde où la nature impose ses règles. Geysers, cascades, champs de lave et nuits blanches.',
@@ -148,7 +151,7 @@ const VOYAGES_DATA = [
   {
     id: 'autriche-2019',
     num: 19, country: 'Autriche', flag: '🇦🇹', city: 'Vienne',
-    coords: [14.5, 47.5],
+    coords: [14.5, 47.5], continent: 'Europe',
     trips: [{ label: 'Oct. 2019' }],
     year: 2019, month: 'Oct.',
     intro: 'Vienne et son faste impérial. Les musées, les cafés historiques, les palais — une ville qui porte l\'histoire avec élégance.',
@@ -158,7 +161,7 @@ const VOYAGES_DATA = [
   {
     id: 'danemark-2022',
     num: 25, country: 'Danemark', flag: '🇩🇰', city: 'Copenhague',
-    coords: [10.2, 55.7],
+    coords: [10.2, 55.7], continent: 'Europe',
     trips: [{ label: 'Déc. 2022' }],
     year: 2022, month: 'Déc.',
     intro: 'Copenhague en décembre — Nyhavn sous les lumières de Noël, le design danois omniprésent et une gastronomie parmi les meilleures d\'Europe.',
@@ -171,7 +174,7 @@ const VOYAGES_DATA = [
     id: 'usa',
     num: 10, country: 'États-Unis', flag: '🇺🇸',
     city: 'Chicago · Roadtrip · Wisconsin',
-    coords: [-95.7, 37.1],
+    coords: [-95.7, 37.1], continent: 'Amérique du Nord',
     trips: [
       { label: '2016' },
       { label: '2018 — Roadtrip' },
@@ -186,7 +189,7 @@ const VOYAGES_DATA = [
     id: 'canada',
     num: 13, country: 'Canada', flag: '🇨🇦',
     city: 'Halifax · Yukon · Whitehorse',
-    coords: [-96.8, 56.1],
+    coords: [-96.8, 56.1], continent: 'Amérique du Nord',
     trips: [
       { label: '2017' },
       { label: 'Juil. 2023 — Halifax' },
@@ -203,7 +206,7 @@ const VOYAGES_DATA = [
     id: 'nouvelle-zelande-2023',
     num: 27, country: 'Nouvelle-Zélande', flag: '🇳🇿',
     city: 'Auckland · Kaikoura · Taupo',
-    coords: [172.6, -41.3],
+    coords: [172.6, -41.3], continent: 'Océanie',
     trips: [{ label: 'Oct. 2023' }],
     year: 2023, month: 'Oct.',
     intro: 'La Nouvelle-Zélande — un pays qui tient toutes ses promesses. Des Alpes du Sud aux geysers de Rotorua, en passant par les baleines de Kaikoura.',
@@ -216,7 +219,7 @@ const VOYAGES_DATA = [
     id: 'japon-2024',
     num: 30, country: 'Japon', flag: '🇯🇵',
     city: 'Tokyo · Kyoto · Fuji · Nara',
-    coords: [138.2, 36.2],
+    coords: [138.2, 36.2], continent: 'Asie',
     trips: [{ label: 'Mars 2024' }],
     year: 2024, month: 'Mars',
     intro: 'Le Japon au moment des cerisiers en fleur — hanami à Kyoto, Fuji sous la neige, Nara et ses daims, et Tokyo qui déborde dans tous les sens.',
@@ -229,7 +232,7 @@ const VOYAGES_DATA = [
     id: 'tanzanie-2024',
     num: 31, country: 'Tanzanie', flag: '🇹🇿',
     city: 'Kilimanjaro · Safari · Zanzibar',
-    coords: [34.9, -6.4],
+    coords: [34.9, -6.4], continent: 'Afrique',
     trips: [{ label: 'Juil. 2024' }],
     year: 2024, month: 'Juil.',
     intro: 'Ascension du Kilimandjaro, safari dans le Serengeti et sur le cratère du Ngorongoro, puis Zanzibar pour souffler. L\'Afrique de l\'Est dans toute sa puissance.',
@@ -240,16 +243,155 @@ const VOYAGES_DATA = [
 
 
 /* ══════════════════════════════════════════════════════
-   2. CARTE INTERACTIVE D3.js
+   2. CALCUL DES STATISTIQUES
+   Tout calculé depuis VOYAGES_DATA — jamais en dur.
+   Ajouter un voyage = stats mises à jour automatiquement.
+══════════════════════════════════════════════════════ */
+
+/* ── Coordonnées de Genève (point de départ) ── */
+const GENEVE = { lat: 46.2044, lon: 6.1432 };
+
+/* ── Formule Haversine ──────────────────────────────
+   Calcule la distance à vol d'oiseau entre deux points
+   GPS en kilomètres.
+   R = rayon de la Terre en km
+────────────────────────────────────────────────── */
+function haversine(lon1, lat1, lon2, lat2) {
+  const R  = 6371;
+  const dL = (lat2 - lat1) * Math.PI / 180;
+  const dl = (lon2 - lon1) * Math.PI / 180;
+  const a  = Math.sin(dL / 2) ** 2
+           + Math.cos(lat1 * Math.PI / 180)
+           * Math.cos(lat2 * Math.PI / 180)
+           * Math.sin(dl / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function calculerStats() {
+  /* Nombre total de trips (pas de pays — on additionne les séjours) */
+  const totalVoyages = VOYAGES_DATA.reduce((sum, v) => sum + v.trips.length, 0);
+
+  /* Nombre de pays visités (hors futurs purs) */
+  const totalPays = VOYAGES_DATA.filter(v => !v.trips.every(t => t.future)).length;
+
+  /* Nombre de continents uniques visités (hors futurs purs) */
+  const continentsVisites = new Set(
+    VOYAGES_DATA
+      .filter(v => !v.trips.every(t => t.future))
+      .map(v => v.continent)
+  );
+  const totalContinents = continentsVisites.size;
+
+  /* Voyages à venir — trips avec future: true */
+  const totalAVenir = VOYAGES_DATA.reduce((sum, v) => {
+    return sum + v.trips.filter(t => t.future).length;
+  }, 0);
+
+  /* Kilomètres parcourus — aller-retour Genève × nombre de trips effectués */
+  const totalKm = VOYAGES_DATA.reduce((sum, v) => {
+    const tripsEffectues = v.trips.filter(t => !t.future).length;
+    const [lon, lat] = v.coords;
+    const dist = haversine(GENEVE.lon, GENEVE.lat, lon, lat);
+    return sum + dist * 2 * tripsEffectues; /* × 2 pour aller-retour */
+  }, 0);
+
+  /* Arrondi au millier le plus proche */
+  const totalKmArrondi = Math.round(totalKm / 1000) * 1000;
+
+  return { totalVoyages, totalPays, totalContinents, totalAVenir, totalKmArrondi };
+}
+
+
+/* ══════════════════════════════════════════════════════
+   3. COMPTEURS ANIMÉS
+   Anime chaque .stat-number de 0 jusqu'à sa valeur cible.
+   Déclenché une seule fois quand le bloc entre dans le viewport.
+══════════════════════════════════════════════════════ */
+
+function animerCompteur(el, cible, duree, prefixe, suffixe) {
+  const debut    = performance.now();
+  const estGrand = cible > 999; /* Pour les km : séparateur de milliers */
+
+  function formater(val) {
+    /* Séparateur de milliers pour les grandes valeurs */
+    const str = estGrand
+      ? Math.round(val).toLocaleString('fr-CH')
+      : Math.round(val).toString();
+    return (prefixe || '') + str + (suffixe || '');
+  }
+
+  function tick(maintenant) {
+    const elapsed  = maintenant - debut;
+    const progress = Math.min(elapsed / duree, 1);
+
+    /* Easing "ease-out" : démarre vite, ralentit à la fin */
+    const eased = 1 - Math.pow(1 - progress, 3);
+
+    el.textContent = formater(eased * cible);
+
+    if (progress < 1) requestAnimationFrame(tick);
+    else el.textContent = formater(cible); /* Valeur exacte à la fin */
+  }
+
+  requestAnimationFrame(tick);
+}
+
+function initCompteurs() {
+  const statsEl = document.querySelector('.voyages-stats');
+  if (!statsEl) return;
+
+  /* Calculer les stats depuis VOYAGES_DATA */
+  const stats = calculerStats();
+
+  /* Associer chaque stat-number à sa valeur calculée */
+  /* data-stat dans le HTML indique quelle stat afficher */
+  const mapping = {
+    'voyages':    { val: stats.totalVoyages,    prefixe: '',  suffixe: ''    },
+    'pays':       { val: stats.totalPays,        prefixe: '',  suffixe: ''    },
+    'continents': { val: stats.totalContinents,  prefixe: '',  suffixe: ''    },
+    'a-venir':    { val: stats.totalAVenir,      prefixe: '',  suffixe: ''    },
+    'km':         { val: stats.totalKmArrondi,   prefixe: '~', suffixe: '' }
+  };
+
+  /* Remplir les valeurs initiales à 0 */
+  statsEl.querySelectorAll('.stat-number[data-stat]').forEach(el => {
+    el.textContent = '0';
+  });
+
+  /* IntersectionObserver : déclenche l'animation à l'entrée dans le viewport */
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+
+      statsEl.querySelectorAll('.stat-number[data-stat]').forEach(el => {
+        const key = el.dataset.stat;
+        const m   = mapping[key];
+        if (!m) return;
+        animerCompteur(el, m.val, 1800, m.prefixe, m.suffixe);
+      });
+
+      /* Ne déclencher qu'une seule fois */
+      observer.unobserve(entry.target);
+    });
+  }, { threshold: 0.3 });
+
+  observer.observe(statsEl);
+}
+
+
+/* ══════════════════════════════════════════════════════
+   4. CARTE INTERACTIVE D3.js
    · Zoom molette + pinch mobile + drag
    · Boutons + / - / reset cliquables
    · Points à taille fixe indépendante du zoom
 ══════════════════════════════════════════════════════ */
 
-const POINT_RADIUS        = 3;
-const POINT_RADIUS_MULTI  = 4;
-const POINT_HOVER_RADIUS  = 5;
-const HALO_RADIUS         = 9;
+const POINT_RADIUS        = 3;    /* Rayon point simple (1 voyage) */
+const POINT_RADIUS_MULTI  = 3;    /* Rayon point multi-voyages */
+const POINT_HOVER_RADIUS  = 7;    /* Rayon au survol */
+const HALO_RADIUS         = 0;    /* Rayon halo multi-voyages (0 = désactivé) */
+const POINT_STROKE        = 1.5;  /* Épaisseur bordure point simple */
+const POINT_STROKE_MULTI  = 1.5;    /* Épaisseur bordure point multi-voyages */
 
 async function initMap() {
   const container = document.getElementById('world-map');
@@ -275,40 +417,63 @@ async function initMap() {
 
   let currentScale = 1;
 
-  const zoom = d3.zoom()
-    .scaleExtent([1, 8])
-    .translateExtent([[0, 0], [W, H]])
-    .on('zoom', (event) => {
-      currentScale = event.transform.k;
-      mapGroup.attr('transform', event.transform);
-      svg.style('cursor', 'grabbing');
-      hidePopup();
+const zoom = d3.zoom()
+  .scaleExtent([1, 8])
+  .translateExtent([[0, 0], [W, H]])
+  .on('zoom', (event) => {
+    currentScale = event.transform.k;
+    mapGroup.attr('transform', event.transform);
+    svg.style('cursor', 'grabbing');
+    hidePopup();
 
-      /* Contre-scaling : les points restent à taille constante visuellement */
-      mapGroup.selectAll('.voyage-point').each(function() {
-        const isMulti = d3.select(this).attr('data-multi') === 'true';
-        d3.select(this).select('.point-circle')
-          .attr('r', (isMulti ? POINT_RADIUS_MULTI : POINT_RADIUS) / currentScale);
-        d3.select(this).select('.halo-circle')
-          .attr('r', HALO_RADIUS / currentScale);
-        d3.select(this).select('.counter-text')
-          .attr('x', 7 / currentScale)
-          .attr('y', -5 / currentScale)
-          .attr('font-size', `${9 / currentScale}`);
-      });
-    })
-    .on('end', () => { svg.style('cursor', 'grab'); });
+    /* Contre-scaling : les points restent à taille constante visuellement */
+    mapGroup.selectAll('.voyage-point').each(function() {
+      const isMulti = d3.select(this).attr('data-multi') === 'true';
+      d3.select(this).select('.point-circle')
+        .attr('r', (isMulti ? POINT_RADIUS_MULTI : POINT_RADIUS) / currentScale);
+      d3.select(this).select('.halo-circle')
+        .attr('r', HALO_RADIUS / currentScale);
+      d3.select(this).select('.counter-text')
+        .attr('x', 7 / currentScale)
+        .attr('y', -5 / currentScale)
+        .attr('font-size', `${9 / currentScale}`);
+    });
 
-  svg.call(zoom);
+    /* Debug zoom — à supprimer une fois les valeurs trouvées */
+    // console.log(`scale: ${event.transform.k.toFixed(2)} | x: ${event.transform.x.toFixed(0)} | y: ${event.transform.y.toFixed(0)}`);
+  })
+  .on('end', () => { svg.style('cursor', 'grab'); });
+
+svg.call(zoom);
+
+/* ── Zoom initial ──────────────────────────────────────
+   Définit la vue au chargement de la carte.
+   
+   scale()      → niveau de zoom (1 = monde entier, 8 = max)
+   translate()  → décalage en pixels pour centrer la vue
+                  W * 0.xx = décalage horizontal (+ = droite, - = gauche)
+                  H * 0.xx = décalage vertical   (+ = bas,   - = haut)
+    
+    >> Pour trouver les bonnes valeurs de coordonnées par défaut, 
+    décommenter la ligne console.log (Debug zoom — à supprimer une fois les valeurs trouvées)
+    et ouvrir la console. Reporter les valeurs. Par défaut :
+      const zoomInitial = d3.zoomIdentity
+        .translate(-184, -58)
+        .scale(1.3);
+────────────────────────────────────────────────────── */
+const zoomInitial = d3.zoomIdentity
+  .translate(-192, -60)  /* Centrage horizontal · vertical */
+  .scale(1.3);           /* Niveau de zoom initial */
+
+svg.call(zoom.transform, zoomInitial);
 
   function zoomIn()    { svg.transition().duration(300).call(zoom.scaleBy, 1.5); }
   function zoomOut()   { svg.transition().duration(300).call(zoom.scaleBy, 1 / 1.5); }
-  function zoomReset() { svg.transition().duration(500).call(zoom.transform, d3.zoomIdentity); }
+  function zoomReset() { svg.transition().duration(500).call(zoom.transform, zoomInitial); } /* Coordonnées au clic sur le bouton réinitialisation du zoom */
 
   svg.on('dblclick.zoom', null);
   svg.on('dblclick', zoomReset);
 
-  /* Chargement des données géographiques */
   try {
     const world = await d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json');
     const countries = topojson.feature(world, world.objects.countries);
@@ -317,9 +482,9 @@ async function initMap() {
       .data(countries.features)
       .join('path')
       .attr('d', pathGenerator)
-      .attr('fill', '#1a1917')
+      .attr('fill', 'rgba(26,25,23,0.7)') /* Couleur des pays sur la map (origine : .attr('fill', '#1a1917')) */
       .attr('stroke', '#2a2825')
-      .attr('stroke-width', 0.4);
+      .attr('stroke-width', 0.25); /* Epaisseur des lignes des pays */
     const graticule = d3.geoGraticule()();
     mapGroup.append('path')
       .datum(graticule)
@@ -333,6 +498,29 @@ async function initMap() {
   }
 
   const mapRect = container;
+
+  /* ── Courbes depuis Genève vers chaque destination ── */
+  const geneveProj = projection([GENEVE.lon, GENEVE.lat]);
+
+  VOYAGES_DATA.forEach(voyage => {
+    if (voyage.trips.every(t => t.future)) return; /* Pas de ligne pour les futurs */
+
+    const [px, py] = projection(voyage.coords);
+    if (!px || isNaN(px)) return;
+
+    /* Courbe de Bézier quadratique :
+      point de contrôle relevé vers le haut pour créer l'arc */
+    const cx = (geneveProj[0] + px) / 2;
+    const cy = Math.min(geneveProj[1], py) - 45; /* Hauteur de la courbe */
+
+    mapGroup.append('path')
+      .attr('class', 'flight-path')
+      .attr('d', `M${geneveProj[0]},${geneveProj[1]} Q${cx},${cy} ${px},${py}`)
+      .attr('fill', 'none')
+      .attr('stroke', 'rgba(74,154,142,0.25)')
+      .attr('stroke-width', 0.4) /* Epaisseur de la ligne */
+      /*.attr('stroke-dasharray', '3,3');*/ /* Pointillés */
+  });
 
   VOYAGES_DATA.forEach(voyage => {
     const [px, py] = projection(voyage.coords);
@@ -365,9 +553,10 @@ async function initMap() {
       .attr('r', isMulti ? POINT_RADIUS_MULTI : POINT_RADIUS)
       .attr('fill', pointColor)
       .attr('stroke', strokeColor)
-      .attr('stroke-width', isMulti ? 2 : 1.5);
+      .attr('stroke-width', isMulti ? POINT_STROKE_MULTI : POINT_STROKE);
 
-    if (isMulti) {
+/* Affiche la mention 'x2, x3, etc.' à côté des points sur la map, si les destinations ont été visitées plus d'1 x */
+/*    if (isMulti) {
       g.append('text')
         .attr('class', 'counter-text')
         .attr('x', 7).attr('y', -5)
@@ -376,7 +565,7 @@ async function initMap() {
         .attr('font-weight', '500')
         .attr('fill', '#4a9a8e')
         .text(`×${voyage.trips.length}`);
-    }
+    } */
 
     g.on('click', function(event) {
       event.stopPropagation();
@@ -398,7 +587,6 @@ async function initMap() {
 
   svg.on('click', () => hidePopup());
 
-  /* Légende fixe, hors du groupe zoomable */
   const legend = svg.append('g').attr('transform', `translate(14, 14)`);
   legend.append('circle').attr('cx', 6).attr('cy', 6).attr('r', 4).attr('fill', '#4a9a8e');
   legend.append('text').attr('x', 16).attr('y', 10).attr('font-size', '10.4').attr('font-family', 'Inter,sans-serif').attr('fill', 'rgba(245,244,240,0.35)').text('Visité');
@@ -411,9 +599,8 @@ async function initMap() {
     .attr('x', W - 14).attr('y', 24).attr('text-anchor', 'end')
     .attr('font-size', '10.4').attr('font-family', 'Inter, sans-serif')
     .attr('letter-spacing', '0.15em').attr('fill', 'rgba(245,244,240,0.2)')
-    .text('Cliquez sur un point pour explorer');
+    .text('Cliquez sur un point pour ouvrir le voyage');
 
-  /* Boutons zoom */
   const controls = document.createElement('div');
   controls.className = 'map-zoom-controls';
   controls.innerHTML = `
@@ -470,25 +657,18 @@ function scrollToCard(voyageId) {
 
 
 /* ══════════════════════════════════════════════════════
-   3. GRILLE DES VOYAGES
-   Génère les cartes dans #voyages-grid-container.
-   Photo aléatoire si photos[] rempli, drapeau sinon.
-   Carte entière cliquable → voyage.html?id=[id]
+   5. GRILLE DES VOYAGES
 ══════════════════════════════════════════════════════ */
 
 function renderVoyagesGrid() {
   const grid = document.getElementById('voyages-grid-container');
   if (!grid) return;
-
-  /* Tri décroissant : voyage le plus récent en premier */
   const sorted = [...VOYAGES_DATA].sort((a, b) => b.num - a.num);
   grid.innerHTML = sorted.map(voyage => buildVoyageCard(voyage)).join('');
 }
 
 function buildVoyageCard(voyage) {
-  /* Un voyage est "futur" si TOUS ses trips sont futurs */
-  const isFuture = voyage.trips.every(t => t.future);
-
+  const isFuture   = voyage.trips.every(t => t.future);
   const visitCount = voyage.trips.length;
   const visitLabel = visitCount > 1
     ? `${visitCount} voyages · depuis ${voyage.year}`
@@ -497,7 +677,6 @@ function buildVoyageCard(voyage) {
   const mediaHTML  = buildMediaHTML(voyage);
   const futurBadge = isFuture ? `<span class="badge-futur">Prévu</span>` : '';
 
-  /* La carte entière est un lien <a> sauf si le voyage est futur */
   if (isFuture) {
     return `
       <article class="voyage-card voyage-card--future" id="card-${voyage.id}">
@@ -531,7 +710,6 @@ function buildVoyageCard(voyage) {
 
 function buildMediaHTML(voyage) {
   if (!voyage.photos || voyage.photos.length === 0) {
-    /* Pas de photos → drapeau centré */
     return `
       <div class="voyage-card-media">
         <div class="voyage-card-placeholder">
@@ -540,12 +718,8 @@ function buildMediaHTML(voyage) {
       </div>
     `;
   }
-
-  /* Photo aléatoire : index au hasard dans le tableau photos[] */
-  /* Math.random() → 0 à 0.999... × longueur → Math.floor → index entier valide */
   const randomIndex = Math.floor(Math.random() * voyage.photos.length);
   const photo = voyage.photos[randomIndex];
-
   return `
     <div class="voyage-card-media">
       <img
@@ -561,12 +735,11 @@ function buildMediaHTML(voyage) {
 
 
 /* ══════════════════════════════════════════════════════
-   4. INITIALISATION
-   DOMContentLoaded garantit que le HTML est prêt
-   avant d'injecter la grille et d'initialiser la carte
+   6. INITIALISATION
 ══════════════════════════════════════════════════════ */
 
 document.addEventListener('DOMContentLoaded', () => {
   renderVoyagesGrid();
   initMap();
+  initCompteurs();
 });
