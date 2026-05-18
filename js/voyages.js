@@ -503,40 +503,38 @@ svg.call(zoom.transform, zoomInitial);
   const geneveProj = projection([GENEVE.lon, GENEVE.lat]);
 
   VOYAGES_DATA.forEach((voyage, i) => {
-    if (voyage.trips.every(t => t.future)) return; /* Pas de ligne pour les futurs */
+    if (voyage.trips.every(t => t.future)) return;
 
     const [px, py] = projection(voyage.coords);
     if (!px || isNaN(px)) return;
 
-    /* Courbe de Bézier quadratique :
-      point de contrôle relevé vers le haut pour créer l'arc */
     const cx = (geneveProj[0] + px) / 2;
-    const cy = Math.min(geneveProj[1], py) - 45; /* Hauteur de la courbe */
+    const cy = Math.min(geneveProj[1], py) - 45;
 
     const line = mapGroup.append('path')
       .attr('class', 'flight-path')
       .attr('d', `M${geneveProj[0]},${geneveProj[1]} Q${cx},${cy} ${px},${py}`)
       .attr('fill', 'none')
       .attr('stroke', 'rgba(74,154,142,0.25)')
-      .attr('stroke-width', 1); /* Epaisseur de la ligne */
-      /*.attr('stroke-dasharray', '3,3');*/ /* Pointillés */
+      .attr('stroke-width', 0.4);
 
-    /* ── Animation de tracé progressif ──────────────────
-      getTotalLength() retourne la longueur totale du chemin.
-      On part avec stroke-dashoffset = longueur totale (ligne invisible)
-      et on anime vers 0 (ligne entièrement tracée).
-      Le délai augmente selon l'index pour un effet staggeré.
-    ────────────────────────────────────────────────── */
-    const node = document.querySelectorAll('.flight-path')[i];
-    const length = node ? node.getTotalLength() : 0;
+    const length = line.node().getTotalLength();
+
+    /* Durée proportionnelle à la longueur de la ligne
+      Les courtes lignes finissent avant les longues */
+    const duree = Math.round(length * 20);  /* Facteur ajustable */
+
     line
       .attr('stroke-dasharray', length)
       .attr('stroke-dashoffset', length)
       .transition()
-      .duration(3000)
-      .delay(0)  /* Délai staggeré par ligne */
+      .duration(duree)
+      .delay(0)
       .ease(d3.easeCubicOut)
       .attr('stroke-dashoffset', 0);
+
+    /* Stocker la durée sur l'élément pour que le point puisse la lire */
+    line.attr('data-duree', duree);
   });
 
   VOYAGES_DATA.forEach((voyage, i) => {
@@ -553,14 +551,17 @@ svg.call(zoom.transform, zoomInitial);
       .style('cursor', 'pointer')
       .attr('data-id', voyage.id);
 
-    /* ── Animation d'apparition staggerée ───────────────
-      Les points apparaissent un par un après les lignes.
-      Délai = durée des lignes (2400ms) + index × 80ms
+    /* ── Animation : le point attend la fin de SA ligne ──
+      On lit la durée stockée sur la ligne correspondante.
     ────────────────────────────────────────────────── */
+    const lignes = mapGroup.selectAll('.flight-path').nodes();
+    const maLigne = lignes[i];
+    const dureeLigne = maLigne ? parseInt(maLigne.getAttribute('data-duree') || 2400) : 2400;
+
     g.style('opacity', 0)
       .transition()
       .duration(400)
-      .delay(3000 + i * 80)
+      .delay(dureeLigne)
       .style('opacity', 1);
 
     if (isMulti) {
@@ -601,8 +602,14 @@ svg.call(zoom.transform, zoomInitial);
       const zoomCible = d3.zoomIdentity
         .translate(W / 2 - px * 3, H / 2 - py * 3)
         .scale(3);
-      svg.transition().duration(600).call(zoom.transform, zoomCible)
-        .on('end', () => showPopup(event, voyage, mapRect));
+        svg.transition().duration(600).call(zoom.transform, zoomCible)
+    .on('end', () => {
+      /* Recalcule la position du point après le zoom */
+      const transform = d3.zoomTransform(svg.node());
+      const [nx, ny] = transform.apply(projection(voyage.coords));
+      const fakeEvent = { clientX: nx + mapRect.getBoundingClientRect().left, clientY: ny + mapRect.getBoundingClientRect().top };
+      showPopup(fakeEvent, voyage, mapRect);
+    });
     });
 
     g.on('mouseenter', function() {
@@ -624,16 +631,17 @@ svg.call(zoom.transform, zoomInitial);
     svg.transition().duration(500).call(zoom.transform, zoomInitial);
   });
 
-  const legend = svg.append('g').attr('transform', `translate(14, 14)`);
+  /* Légende — empilée verticalement, à droite des boutons zoom */
+  const legend = svg.append('g').attr('transform', `translate(60, ${H - 40})`);
   legend.append('circle').attr('cx', 6).attr('cy', 6).attr('r', 4).attr('fill', '#4a9a8e');
   legend.append('text').attr('x', 16).attr('y', 10).attr('font-size', '10.4').attr('font-family', 'Inter,sans-serif').attr('fill', 'rgba(245,244,240,0.35)').text('Visité');
-  legend.append('circle').attr('cx', 72).attr('cy', 6).attr('r', 4).attr('fill', '#c9a96e');
-  legend.append('text').attr('x', 82).attr('y', 10).attr('font-size', '10.4').attr('font-family', 'Inter,sans-serif').attr('fill', 'rgba(245,244,240,0.35)').text('Prévu 2026');
-  legend.append('circle').attr('cx', 160).attr('cy', 6).attr('r', 9).attr('fill', 'rgba(74,154,142,0.08)').attr('stroke', 'rgba(74,154,142,0.2)').attr('stroke-width', 1);
-  legend.append('circle').attr('cx', 160).attr('cy', 6).attr('r', 4).attr('fill', '#4a9a8e');
-  legend.append('text').attr('x', 175).attr('y', 10).attr('font-size', '10.4').attr('font-family', 'Inter,sans-serif').attr('fill', 'rgba(245,244,240,0.35)').text('Plusieurs voyages');
+  legend.append('circle').attr('cx', 6).attr('cy', 24).attr('r', 4).attr('fill', '#c9a96e');
+  legend.append('text').attr('x', 16).attr('y', 28).attr('font-size', '10.4').attr('font-family', 'Inter,sans-serif').attr('fill', 'rgba(245,244,240,0.35)').text('À venir');
+  // legend.append('circle').attr('cx', 160).attr('cy', 6).attr('r', 9).attr('fill', 'rgba(74,154,142,0.08)').attr('stroke', 'rgba(74,154,142,0.2)').attr('stroke-width', 1);
+  // legend.append('circle').attr('cx', 160).attr('cy', 6).attr('r', 4).attr('fill', '#4a9a8e');
+  // legend.append('text').attr('x', 175).attr('y', 10).attr('font-size', '10.4').attr('font-family', 'Inter,sans-serif').attr('fill', 'rgba(245,244,240,0.35)').text('Plusieurs voyages');
   svg.append('text')
-    .attr('x', W - 14).attr('y', 24).attr('text-anchor', 'end')
+    .attr('x', W - 14).attr('y', H - 10).attr('text-anchor', 'end')
     .attr('font-size', '10.4').attr('font-family', 'Inter, sans-serif')
     .attr('letter-spacing', '0.15em').attr('fill', 'rgba(245,244,240,0.2)')
     .text('Cliquez sur un point pour ouvrir le voyage');
@@ -641,9 +649,9 @@ svg.call(zoom.transform, zoomInitial);
   const controls = document.createElement('div');
   controls.className = 'map-zoom-controls';
   controls.innerHTML = `
+    <button class="map-zoom-btn map-zoom-reset" id="zoom-reset" aria-label="Réinitialiser">⌖</button>
     <button class="map-zoom-btn" id="zoom-in"    aria-label="Zoom avant">+</button>
     <button class="map-zoom-btn" id="zoom-out"   aria-label="Zoom arrière">−</button>
-    <button class="map-zoom-btn map-zoom-reset" id="zoom-reset" aria-label="Réinitialiser">⌖</button>
   `;
   container.appendChild(controls);
   document.getElementById('zoom-in').addEventListener('click', zoomIn);

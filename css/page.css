@@ -109,7 +109,7 @@
   margin: 0 auto;
   padding-left: var(--content-padding);
   padding-right: var(--content-padding);
-  padding-bottom: 64px;
+  padding-bottom: 12px;
 }
 
 .voyages-title {
@@ -128,7 +128,7 @@
   display: flex;
   align-items: stretch;
   justify-content: space-between;
-  gap: 12px;
+  gap: 24px;
 }
 
 .stat-item {
