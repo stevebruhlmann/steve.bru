@@ -729,7 +729,7 @@ function buildVoyageCard(voyage) {
         <div class="voyage-card-body">
           <div class="voyage-card-meta">
             <span class="voyage-card-flag">${voyage.flag}</span>
-            <span class="voyage-card-num">#${voyage.num}${futurBadge}</span>
+            
           </div>
           <h2 class="voyage-card-title">${voyage.country}</h2>
           <p class="voyage-card-subtitle">${voyage.city} · ${visitLabel}</p>
@@ -744,7 +744,7 @@ function buildVoyageCard(voyage) {
       <div class="voyage-card-body">
         <div class="voyage-card-meta">
           <span class="voyage-card-flag">${voyage.flag}</span>
-          <span class="voyage-card-num">#${voyage.num}</span>
+          
         </div>
         <h2 class="voyage-card-title">${voyage.country}</h2>
         <p class="voyage-card-subtitle">${voyage.city} · ${visitLabel}</p>
