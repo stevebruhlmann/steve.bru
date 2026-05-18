@@ -518,7 +518,7 @@ svg.call(zoom.transform, zoomInitial);
       .attr('d', `M${geneveProj[0]},${geneveProj[1]} Q${cx},${cy} ${px},${py}`)
       .attr('fill', 'none')
       .attr('stroke', 'rgba(74,154,142,0.25)')
-      .attr('stroke-width', 0.4); /* Epaisseur de la ligne */
+      .attr('stroke-width', 1); /* Epaisseur de la ligne */
       /*.attr('stroke-dasharray', '3,3');*/ /* Pointillés */
 
     /* ── Animation de tracé progressif ──────────────────
@@ -533,13 +533,13 @@ svg.call(zoom.transform, zoomInitial);
       .attr('stroke-dasharray', length)
       .attr('stroke-dashoffset', length)
       .transition()
-      .duration(10000)
+      .duration(3000)
       .delay(0)  /* Délai staggeré par ligne */
       .ease(d3.easeCubicOut)
       .attr('stroke-dashoffset', 0);
   });
 
-  VOYAGES_DATA.forEach(voyage => {
+  VOYAGES_DATA.forEach((voyage, i) => {
     const [px, py] = projection(voyage.coords);
     if (px === undefined || isNaN(px)) return;
 
@@ -552,6 +552,16 @@ svg.call(zoom.transform, zoomInitial);
       .attr('transform', `translate(${px}, ${py})`)
       .style('cursor', 'pointer')
       .attr('data-id', voyage.id);
+
+    /* ── Animation d'apparition staggerée ───────────────
+      Les points apparaissent un par un après les lignes.
+      Délai = durée des lignes (2400ms) + index × 80ms
+    ────────────────────────────────────────────────── */
+    g.style('opacity', 0)
+      .transition()
+      .duration(400)
+      .delay(3000 + i * 80)
+      .style('opacity', 1);
 
     if (isMulti) {
       g.append('circle')
@@ -586,7 +596,13 @@ svg.call(zoom.transform, zoomInitial);
 
     g.on('click', function(event) {
       event.stopPropagation();
-      showPopup(event, voyage, mapRect);
+      /* Zoom vers la destination puis affiche la pop-up */
+      const [px, py] = projection(voyage.coords);
+      const zoomCible = d3.zoomIdentity
+        .translate(W / 2 - px * 3, H / 2 - py * 3)
+        .scale(3);
+      svg.transition().duration(600).call(zoom.transform, zoomCible)
+        .on('end', () => showPopup(event, voyage, mapRect));
     });
 
     g.on('mouseenter', function() {
@@ -602,7 +618,11 @@ svg.call(zoom.transform, zoomInitial);
     });
   });
 
-  svg.on('click', () => hidePopup());
+  svg.on('click', () => {
+    hidePopup();
+    /* Retour au zoom initial */
+    svg.transition().duration(500).call(zoom.transform, zoomInitial);
+  });
 
   const legend = svg.append('g').attr('transform', `translate(14, 14)`);
   legend.append('circle').attr('cx', 6).attr('cy', 6).attr('r', 4).attr('fill', '#4a9a8e');

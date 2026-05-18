@@ -240,4 +240,26 @@ document.addEventListener('navbar-ready', () => {
     });
   }
 
+  /* ── Fonction commune d'illumination par ancre ── */
+  function illuminerSection(hash) {
+    if (!hash || !window.matchMedia('(pointer: fine)').matches) return;
+    const cible = document.querySelector(hash);
+    if (cible && cible.classList.contains('section')) {
+      sections.forEach(s => s.classList.add('dim'));
+      cible.classList.remove('dim');
+    }
+  }
+
+  /* Au chargement si URL contient une ancre */
+  illuminerSection(window.location.hash);
+
+  /* Interception des clics sur liens d'ancre */
+  document.addEventListener('click', e => {
+    const link = e.target.closest('a[href^="#"]');
+    if (link) illuminerSection(link.getAttribute('href'));
+  });
+
+  /* Fallback hashchange (navigation clavier, etc.) */
+  window.addEventListener('hashchange', () => illuminerSection(window.location.hash));
+
 });

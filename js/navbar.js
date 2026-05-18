@@ -33,6 +33,14 @@ async function loadNavbar() {
       }
     });
 
+    /* Sur index.html, remplace href="index.html#contact" par "#contact"
+      pour éviter un rechargement de page au clic */
+    if (filename === 'index' || filename === '') {
+      container.querySelectorAll('a[href="index.html#contact"]').forEach(link => {
+        link.setAttribute('href', '#contact');
+      });
+    }
+
     /* ── Sur les pages secondaires : navbar visible immédiatement ── */
     /* Sur index.html, c'est main.js qui gère l'animation et ajoute    */
     /* les classes visible/scrolled. Sur les autres pages, on les      */
