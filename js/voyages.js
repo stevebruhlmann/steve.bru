@@ -502,7 +502,7 @@ svg.call(zoom.transform, zoomInitial);
   /* ── Courbes depuis Genève vers chaque destination ── */
   const geneveProj = projection([GENEVE.lon, GENEVE.lat]);
 
-  VOYAGES_DATA.forEach(voyage => {
+  VOYAGES_DATA.forEach((voyage, i) => {
     if (voyage.trips.every(t => t.future)) return; /* Pas de ligne pour les futurs */
 
     const [px, py] = projection(voyage.coords);
@@ -513,13 +513,30 @@ svg.call(zoom.transform, zoomInitial);
     const cx = (geneveProj[0] + px) / 2;
     const cy = Math.min(geneveProj[1], py) - 45; /* Hauteur de la courbe */
 
-    mapGroup.append('path')
+    const line = mapGroup.append('path')
       .attr('class', 'flight-path')
       .attr('d', `M${geneveProj[0]},${geneveProj[1]} Q${cx},${cy} ${px},${py}`)
       .attr('fill', 'none')
       .attr('stroke', 'rgba(74,154,142,0.25)')
-      .attr('stroke-width', 0.4) /* Epaisseur de la ligne */
+      .attr('stroke-width', 0.4); /* Epaisseur de la ligne */
       /*.attr('stroke-dasharray', '3,3');*/ /* Pointillés */
+
+    /* ── Animation de tracé progressif ──────────────────
+      getTotalLength() retourne la longueur totale du chemin.
+      On part avec stroke-dashoffset = longueur totale (ligne invisible)
+      et on anime vers 0 (ligne entièrement tracée).
+      Le délai augmente selon l'index pour un effet staggeré.
+    ────────────────────────────────────────────────── */
+    const node = document.querySelectorAll('.flight-path')[i];
+    const length = node ? node.getTotalLength() : 0;
+    line
+      .attr('stroke-dasharray', length)
+      .attr('stroke-dashoffset', length)
+      .transition()
+      .duration(10000)
+      .delay(0)  /* Délai staggeré par ligne */
+      .ease(d3.easeCubicOut)
+      .attr('stroke-dashoffset', 0);
   });
 
   VOYAGES_DATA.forEach(voyage => {
