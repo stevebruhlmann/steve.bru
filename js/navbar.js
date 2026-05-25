@@ -71,7 +71,7 @@ async function loadNavbar() {
       const data = typeof VOYAGES_DATA !== 'undefined'
         ? VOYAGES_DATA.find(v => v.id === id)
         : null;
-      breadcrumbMap['voyage'] = data ? data.country : 'Voyage';
+      breadcrumbMap['voyage'] = data ? data.country.replace(/;/g, ' / ') : 'Voyage';
     }
 
     if (!isIndex && breadcrumbMap[filename]) {

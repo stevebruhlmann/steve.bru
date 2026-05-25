@@ -1,30 +1,58 @@
-/* ============================================================
-   voyage.js — Logique de la page dédiée d'un voyage
+/* ══════════════════════════════════════════════════════
+   steve.bru — voyage.js
+   Logique de la page dédiée d'un voyage (voyage.html)
    Contient :
-     1. Lecture de l'id dans l'URL (?id=tanzanie-2024)
-     2. Rendu de l'en-tête (titre, meta, intro)
-     3. Rendu de la galerie masonry (5 col desktop, 2 mobile)
+     1. Lecture de l'id dans l'URL (?id=tanzanie-202407)
+     2. Rendu de l'en-tête (titre, meta, type, intro)
+     3. Rendu de la galerie masonry
      4. Lightbox (ouverture, navigation, swipe, clavier)
 
-   IMPORTANT : voyage.html charge voyages.js AVANT ce fichier.
+   IMPORTANT : voyage.html charge voyages_data.js AVANT ce fichier.
    VOYAGES_DATA est donc déjà disponible — pas de duplication.
-   Ajouter un voyage = modifier uniquement voyages.js.
-   ============================================================ */
+   Ajouter un voyage = modifier uniquement voyages_data.js.
+══════════════════════════════════════════════════════ */
 
 
-/* ── 1. LECTURE DE L'ID DANS L'URL ──────────────────────────
-   L'URL ressemble à : voyage.html?id=tanzanie-2024
-   Convention ids : AAAAMM pour voyages uniques (ex: tanzanie-202407)
-                    nom court pour pays groupés (ex: norvege, portugal)
-   ──────────────────────────────────────────────────────────── */
+/* ── 1. UTILITAIRES ─────────────────────────────────── */
+
+const MOIS = [
+  'Janvier','Février','Mars','Avril','Mai','Juin',
+  'Juillet','Août','Septembre','Octobre','Novembre','Décembre'
+];
+
+/* Formatte une date ISO en "Mois AAAA" — ex: "Juillet 2024" */
+function formatMoisAnnee(dateStr) {
+  if (!dateStr) return null;
+  const d = new Date(dateStr);
+  return `${MOIS[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+/* Vérifie si un voyage est futur depuis date_dep */
+function isFuture(v) {
+  if (!v.date_dep) return false;
+  return new Date(v.date_dep) > new Date();
+}
+
+/* Calcule la durée en jours entre départ et retour */
+function dureeVoyage(v) {
+  if (!v.date_dep || !v.date_ret) return null;
+  const dep = new Date(v.date_dep);
+  const ret = new Date(v.date_ret);
+  const jours = Math.round((ret - dep) / (1000 * 60 * 60 * 24));
+  return jours > 0 ? jours : null;
+}
+
+
+/* ── 2. LECTURE DE L'ID DANS L'URL ──────────────────────
+   L'URL ressemble à : voyage.html?id=tanzanie-202407
+──────────────────────────────────────────────────────── */
 
 const params   = new URLSearchParams(window.location.search);
 const voyageId = params.get('id');
+const voyage   = VOYAGES_DATA.find(v => v.id === voyageId);
 
-const voyage = VOYAGES_DATA.find(v => v.id === voyageId);
 
-
-/* ── 2. INITIALISATION ───────────────────────────────────── */
+/* ── 3. INITIALISATION ───────────────────────────────── */
 
 if (!voyage) {
   document.getElementById('voyage-header').innerHTML = `
@@ -41,91 +69,92 @@ if (!voyage) {
 }
 
 
-/* ── 3. RENDU DE L'EN-TÊTE ───────────────────────────────── */
+/* ── 4. RENDU DE L'EN-TÊTE ───────────────────────────── */
 
 function renderHeader(v) {
-  const moisLabels = ['Janvier','Février','Mars','Avril','Mai','Juin',
-                      'Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
 
-  let dateLabel;
-  if (typeof v.month === 'number') {
-    dateLabel = `${moisLabels[v.month - 1]} ${v.year}`;
-  } else if (typeof v.month === 'string') {
-    dateLabel = `${v.month} ${v.year}`;
-  } else {
-    dateLabel = `Depuis ${v.year}`;
-  }
+  /* Date : mois + année uniquement */
+  const dateLabel  = formatMoisAnnee(v.date_dep) || '';
 
-  const badgeFutur = v.future
+  /* Durée du voyage */
+  const duree      = dureeVoyage(v);
+  const dureeLabel = duree ? `${duree} jours` : '';
+
+  /* Badge futur */
+  const badgeFutur = isFuture(v)
     ? `<span class="voyage-badge-futur">Prévu</span>`
+    : '';
+
+  /* Badges type de voyage (Séjour / Roadtrip / Safari) */
+  const badgesType = v.trip_type.map(t =>
+    `<span class="voyage-badge-type">${t}</span>`
+  ).join('');
+
+  /* Étapes — affichées si disponibles */
+  const etapesHTML = v.stops && v.stops.length > 0
+    ? `<p class="voyage-etapes">${v.stops.join(' · ')}</p>`
     : '';
 
   document.getElementById('voyage-header').innerHTML = `
     <div class="voyage-header">
-      <h1 class="voyage-title">${v.country} ${v.flag} ${badgeFutur}</h1>
-      <div class="voyage-meta">
-        <span>#${v.num}</span>
-        <span class="voyage-meta__sep"></span>
-        <span>${v.city}</span>
-        <span class="voyage-meta__sep"></span>
-        <span>${dateLabel}</span>
+
+      <div class="voyage-header-badges">
+        ${badgesType}
+        ${badgeFutur}
       </div>
-      <p class="voyage-intro">${v.intro}</p>
+
+      <h1 class="voyage-title section-title">${v.country.replace(/;/g, ' / ')}</h1>
+
+      <div class="voyage-meta">
+        <span>${dateLabel}</span>
+        ${dureeLabel ? `<span class="voyage-meta__sep">·</span><span>${dureeLabel}</span>` : ''}
+      </div>
+
+      ${etapesHTML}
+      ${v.intro ? `<p class="voyage-intro">${v.intro}</p>` : ''}
+
     </div>
   `;
 }
 
 
-/* ── 4. PLACEHOLDERS UNSPLASH ────────────────────────────────
+/* ── 5. PLACEHOLDERS PICSUM ──────────────────────────────
    Utilisés uniquement quand photos[] est vide.
-   50 photos : mix paysage (2:3) et portrait (3:2).
-   Chaque seed différent = image différente sur Unsplash.
-   Format : { url, portrait }
-     url      → src de l'image
-     portrait → true = format portrait, false = paysage
-   ──────────────────────────────────────────────────────────── */
+   50 images : mix paysage et portrait.
+──────────────────────────────────────────────────────── */
 
 function genererPlaceholders(count) {
   const photos = [];
   for (let i = 0; i < count; i++) {
-    const isPortrait = [2, 5, 8, 11, 15, 19, 23, 27, 31, 35, 39, 43, 47].includes(i);
+    const isPortrait = [2,5,8,11,15,19,23,27,31,35,39,43,47].includes(i);
     const w = isPortrait ? 800  : 1200;
     const h = isPortrait ? 1200 : 800;
-    photos.push({
-      /* seed=i+1 garantit des images différentes à chaque index */
-      url: `https://picsum.photos/seed/${i + 1}/${w}/${h}`,
-      portrait: isPortrait
-    });
+    photos.push({ url: `https://picsum.photos/seed/${i + 1}/${w}/${h}`, portrait: isPortrait });
   }
   return photos;
 }
 
 
-/* ── 5. RENDU DE LA GALERIE MASONRY ─────────────────────────
+/* ── 6. RENDU DE LA GALERIE MASONRY ──────────────────────
    photos[] rempli → vraies photos locales
-   photos[] vide   → 50 placeholders Unsplash/Picsum
-   ──────────────────────────────────────────────────────────── */
+   photos[] vide   → 50 placeholders Picsum
+──────────────────────────────────────────────────────── */
 
 function renderGalerie(v) {
   const container = document.getElementById('voyage-galerie');
   const hasPhotos = v.photos && v.photos.length > 0;
 
-  /* Construire le tableau d'items à afficher */
-  let items; /* Tableau d'objets { src, portrait } */
+  let items;
 
   if (hasPhotos) {
-    /* Vraies photos : fichiers locaux dans images/voyages/[id]/full/ */
     items = v.photos.map(photo => ({
       src: `images/voyages/${v.id}/full/${photo}`,
-      portrait: false /* On ne connaît pas le format à l'avance */
+      portrait: false
     }));
   } else {
-    /* Placeholders : 50 images Picsum aléatoires */
-    const placeholders = genererPlaceholders(50);
-    items = placeholders.map(p => ({ src: p.url, portrait: p.portrait }));
+    items = genererPlaceholders(50).map(p => ({ src: p.url, portrait: p.portrait }));
   }
 
-  /* Générer le HTML de chaque item */
   const itemsHTML = items.map((item, index) => `
     <div
       class="galerie__item${item.portrait ? ' galerie__item--portrait' : ''}"
@@ -146,10 +175,9 @@ function renderGalerie(v) {
     </div>
   `).join('');
 
-  /* Ajouter un indicateur visuel si ce sont des placeholders */
   const bannerHTML = !hasPhotos ? `
     <div class="galerie__placeholder-banner">
-      Aperçu avec photos exemples — les vraies photos arrivent bientôt
+      
     </div>
   ` : '';
 
@@ -158,10 +186,8 @@ function renderGalerie(v) {
     <div class="voyage-galerie">${itemsHTML}</div>
   `;
 
-  /* Stocker les items pour la lightbox */
   container._items = items;
 
-  /* Clic sur un item → ouvrir la lightbox */
   container.querySelectorAll('.galerie__item').forEach(item => {
     item.addEventListener('click', () => {
       ouvrirLightbox(v, parseInt(item.dataset.index, 10), container._items);
@@ -176,12 +202,12 @@ function renderGalerie(v) {
 }
 
 
-/* ── 6. LIGHTBOX ─────────────────────────────────────────────
-   Fonctionne avec les vraies photos ET les placeholders
-   ──────────────────────────────────────────────────────────── */
+/* ── 7. LIGHTBOX ─────────────────────────────────────────
+   Fonctionne avec vraies photos ET placeholders.
+──────────────────────────────────────────────────────── */
 
-let lbItems  = []; /* Tableau des items affichés dans la galerie */
-let lbIndex  = 0;  /* Index de la photo affichée */
+let lbItems  = [];
+let lbIndex  = 0;
 
 const lbEl   = document.getElementById('lightbox');
 const lbImg  = document.getElementById('lightbox-img');
@@ -190,10 +216,8 @@ const lbPrev = document.getElementById('lightbox-prev');
 const lbNext = document.getElementById('lightbox-next');
 
 function initLightbox() {
-  document.getElementById('lightbox-backdrop')
-    .addEventListener('click', fermerLightbox);
-  document.getElementById('lightbox-close')
-    .addEventListener('click', fermerLightbox);
+  document.getElementById('lightbox-backdrop').addEventListener('click', fermerLightbox);
+  document.getElementById('lightbox-close').addEventListener('click', fermerLightbox);
 
   lbPrev.addEventListener('click', () => naviguer(-1));
   lbNext.addEventListener('click', () => naviguer(+1));
@@ -232,8 +256,8 @@ function fermerLightbox() {
 
 function afficherPhoto() {
   const item = lbItems[lbIndex];
-  lbImg.src = item.src;
-  lbImg.alt = `Photo ${lbIndex + 1}`;
+  lbImg.src  = item.src;
+  lbImg.alt  = `Photo ${lbIndex + 1}`;
   lbCpt.textContent = `${lbIndex + 1} / ${lbItems.length}`;
 
   const seule = lbItems.length <= 1;

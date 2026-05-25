@@ -1,260 +1,34 @@
 /* ══════════════════════════════════════════════════════
    steve.bru — voyages.js
    Logique de la page voyages.html :
-   · Données de tous les voyages
    · Calcul automatique des stats (voyages, pays, continents, km)
    · Compteurs animés au scroll
    · Carte interactive D3.js avec zoom
-   · Grille des voyages avec vignette photo aléatoire
+     → Points groupés par aéroport de destination
+     → Lignes animées depuis Genève vers les aéroports
+   · Grille des voyages (une carte par voyage)
+
+   DONNÉES : définies dans voyages_data.js (chargé avant ce fichier)
+   VOYAGES_DATA est donc déjà disponible ici.
+   Ajouter un voyage = modifier voyages_data.js uniquement.
 ══════════════════════════════════════════════════════ */
 
 
 /* ══════════════════════════════════════════════════════
-   1. DONNÉES DES VOYAGES
-   Champs :
-     id        → identifiant unique (URL voyage.html?id=...)
-     num       → numéro du voyage (ordre chronologique)
-     country   → nom du pays affiché
-     flag      → emoji drapeau
-     city      → villes / étapes visitées
-     coords    → [longitude, latitude] pour la carte D3 et le calcul km
-     continent → continent pour le compteur (Europe, Amérique du Nord,
-                 Amérique du Sud, Asie, Afrique, Océanie, Antarctique)
-     trips     → liste des séjours ({ label, future? })
-     year      → année du premier voyage dans ce pays
-     month     → mois si voyage unique (null si plusieurs)
-     intro     → texte d'introduction sur la page dédiée
-     photos    → fichiers dans images/voyages/[id]/thumb/
-     page      → chemin de la page dédiée (voyage.html?id=...)
-     future    → true si TOUS les voyages de ce pays sont futurs
+   1. UTILITAIRES
 ══════════════════════════════════════════════════════ */
 
-const VOYAGES_DATA = [
-
-  /* ── Europe ── */
-
-  {
-    id: 'hongrie-2010',
-    num: 1, country: 'Hongrie', flag: '🇭🇺', city: 'Budapest',
-    coords: [19.0, 47.5], continent: 'Europe',
-    trips: [{ label: '2010' }],
-    year: 2010, month: null,
-    intro: 'Premier voyage en avion, premier dépaysement. Budapest avec ses bains thermaux, son architecture austro-hongroise et ses rives du Danube illuminées la nuit.',
-    photos: [], page: 'voyage.html?id=hongrie-2010', future: false
-  },
-
-  {
-    id: 'finlande-2011',
-    num: 2, country: 'Finlande', flag: '🇫🇮', city: 'Helsinki',
-    coords: [25.0, 60.2], continent: 'Europe',
-    trips: [{ label: '2011' }, { label: 'Juil. 2022' }],
-    year: 2011, month: null,
-    intro: 'Helsinki en été, quand le soleil ne se couche presque pas. Une ville propre, silencieuse, avec la mer partout. Retour en 2022 avec une escapade côté suédois.',
-    photos: [], page: 'voyage.html?id=finlande-2011', future: false
-  },
-
-  {
-    id: 'irlande-2012',
-    num: 3, country: 'Irlande', flag: '🇮🇪', city: 'Dublin',
-    coords: [-8.2, 53.1], continent: 'Europe',
-    trips: [{ label: '2012' }, { label: 'Nov. 2021' }],
-    year: 2012, month: null,
-    intro: 'Dublin et ses pubs, ses façades colorées et son sens de l\'humour. Une ville qui se vit autant qu\'elle se visite — deux fois plutôt qu\'une.',
-    photos: [], page: 'voyage.html?id=irlande-2012', future: false
-  },
-
-  {
-    id: 'espagne-2012',
-    num: 4, country: 'Espagne', flag: '🇪🇸', city: 'Valence',
-    coords: [-3.7, 40.4], continent: 'Europe',
-    trips: [{ label: '2012' }, { label: 'Oct. 2024' }],
-    year: 2012, month: null,
-    intro: 'Barcelone d\'abord, puis Valence — l\'Espagne entre Gaudí et la Cité des Arts et des Sciences. Lumière méditerranéenne, énergie permanente.',
-    photos: [], page: 'voyage.html?id=espagne-2012', future: false
-  },
-
-  {
-    id: 'pologne-2012',
-    num: 5, country: 'Pologne', flag: '🇵🇱', city: 'Varsovie',
-    coords: [21.0, 52.2], continent: 'Europe',
-    trips: [{ label: '2012' }, { label: 'Juil. 2021' }],
-    year: 2012, month: null,
-    intro: 'Cracovie en décembre sous la neige, puis retour en été. La vieille ville préservée, le marché de Noël, et l\'ombre de l\'histoire partout.',
-    photos: [], page: 'voyage.html?id=pologne-2012', future: false
-  },
-
-  {
-    id: 'norvege',
-    num: 6, country: 'Norvège', flag: '🇳🇴',
-    city: 'Stavanger · Oslo · Karmøy · Arctique',
-    coords: [10.7, 59.9], continent: 'Europe',
-    trips: [
-      { label: '2014' },
-      { label: '2015' },
-      { label: '2017' },
-      { label: 'Juil. 2020 — Stavanger' },
-      { label: 'Jan. 2025 — Oslo' },
-      { label: 'Juin 2026 — Karmøy', future: true }
-    ],
-    year: 2014, month: null,
-    intro: 'Six voyages en Norvège — et ce n\'est pas fini. Stavanger et le Preikestolen, les fjords en été, Oslo en hiver arctique, et bientôt Karmøy, l\'île ancestrale de la famille.',
-    photos: [], page: 'voyage.html?id=norvege', future: false
-  },
-
-  {
-    id: 'portugal',
-    num: 7, country: 'Portugal', flag: '🇵🇹',
-    city: 'Lisbonne · Porto',
-    coords: [-9.1, 38.7], continent: 'Europe',
-    trips: [
-      { label: '2014' },
-      { label: 'Avr. 2017 — Lisbonne' },
-      { label: 'Avr. 2019 — Lisbonne' },
-      { label: 'Mai 2022 — Porto → Lisbonne' },
-      { label: 'Fév. 2024 — Lisbonne' }
-    ],
-    year: 2014, month: null,
-    intro: 'Cinq fois au Portugal — Lisbonne et ses sept collines, Porto et ses caves à vin. Une ville mélancolique et lumineuse à la fois, qui ramène toujours.',
-    photos: [], page: 'voyage.html?id=portugal', future: false
-  },
-
-  {
-    id: 'turquie-2015',
-    num: 9, country: 'Turquie', flag: '🇹🇷', city: 'Istanbul',
-    coords: [35.2, 38.9], continent: 'Europe', /* Istanbul côté européen */
-    trips: [{ label: '2015' }],
-    year: 2015, month: null,
-    intro: 'Istanbul à la croisée de deux continents. Le Grand Bazar, Sainte-Sophie, le Bosphore au coucher du soleil. Une ville qui n\'appartient qu\'à elle-même.',
-    photos: [], page: 'voyage.html?id=turquie-2015', future: false
-  },
-
-  {
-    id: 'croatie-2018',
-    num: 16, country: 'Croatie', flag: '🇭🇷', city: 'Split',
-    coords: [15.2, 45.1], continent: 'Europe',
-    trips: [{ label: 'Sept. 2018' }],
-    year: 2018, month: 'Sept.',
-    intro: 'Split et sa vieille ville construite dans le palais de Dioclétien. La mer adriatique, les îles au loin, et une douceur de vivre méditerranéenne.',
-    photos: [], page: 'voyage.html?id=croatie-2018', future: false
-  },
-
-  {
-    id: 'islande-2019',
-    num: 18, country: 'Islande', flag: '🇮🇸', city: 'Reykjavik',
-    coords: [-19.0, 64.9], continent: 'Europe',
-    trips: [{ label: 'Juil. 2019' }],
-    year: 2019, month: 'Juil.',
-    intro: 'L\'Islande — une île au bout du monde où la nature impose ses règles. Geysers, cascades, champs de lave et nuits blanches.',
-    photos: [], page: 'voyage.html?id=islande-2019', future: false
-  },
-
-  {
-    id: 'autriche-2019',
-    num: 19, country: 'Autriche', flag: '🇦🇹', city: 'Vienne',
-    coords: [14.5, 47.5], continent: 'Europe',
-    trips: [{ label: 'Oct. 2019' }],
-    year: 2019, month: 'Oct.',
-    intro: 'Vienne et son faste impérial. Les musées, les cafés historiques, les palais — une ville qui porte l\'histoire avec élégance.',
-    photos: [], page: 'voyage.html?id=autriche-2019', future: false
-  },
-
-  {
-    id: 'danemark-2022',
-    num: 25, country: 'Danemark', flag: '🇩🇰', city: 'Copenhague',
-    coords: [10.2, 55.7], continent: 'Europe',
-    trips: [{ label: 'Déc. 2022' }],
-    year: 2022, month: 'Déc.',
-    intro: 'Copenhague en décembre — Nyhavn sous les lumières de Noël, le design danois omniprésent et une gastronomie parmi les meilleures d\'Europe.',
-    photos: [], page: 'voyage.html?id=danemark-2022', future: false
-  },
-
-  /* ── Amérique du Nord ── */
-
-  {
-    id: 'usa',
-    num: 10, country: 'États-Unis', flag: '🇺🇸',
-    city: 'Chicago · Roadtrip · Wisconsin',
-    coords: [-95.7, 37.1], continent: 'Amérique du Nord',
-    trips: [
-      { label: '2016' },
-      { label: '2018 — Roadtrip' },
-      { label: 'Déc. 2023 — Chicago' }
-    ],
-    year: 2016, month: null,
-    intro: 'New York d\'abord, puis le grand roadtrip Las Vegas → San Francisco, puis Chicago en hiver. L\'Amérique dans toute sa démesure — trois fois, trois visages.',
-    photos: [], page: 'voyage.html?id=usa', future: false
-  },
-
-  {
-    id: 'canada',
-    num: 13, country: 'Canada', flag: '🇨🇦',
-    city: 'Halifax · Yukon · Whitehorse',
-    coords: [-96.8, 56.1], continent: 'Amérique du Nord',
-    trips: [
-      { label: '2017' },
-      { label: 'Juil. 2023 — Halifax' },
-      { label: 'Juil. 2025 — Yukon' }
-    ],
-    year: 2017, month: null,
-    intro: 'Toronto et Québec d\'abord, puis les Maritimes et Halifax, puis le Yukon sauvage. Le Canada à chaque fois plus loin, plus grand, plus beau.',
-    photos: [], page: 'voyage.html?id=canada', future: false
-  },
-
-  /* ── Océanie ── */
-
-  {
-    id: 'nouvelle-zelande-2023',
-    num: 27, country: 'Nouvelle-Zélande', flag: '🇳🇿',
-    city: 'Auckland · Kaikoura · Taupo',
-    coords: [172.6, -41.3], continent: 'Océanie',
-    trips: [{ label: 'Oct. 2023' }],
-    year: 2023, month: 'Oct.',
-    intro: 'La Nouvelle-Zélande — un pays qui tient toutes ses promesses. Des Alpes du Sud aux geysers de Rotorua, en passant par les baleines de Kaikoura.',
-    photos: [], page: 'voyage.html?id=nouvelle-zelande-2023', future: false
-  },
-
-  /* ── Asie ── */
-
-  {
-    id: 'japon-2024',
-    num: 30, country: 'Japon', flag: '🇯🇵',
-    city: 'Tokyo · Kyoto · Fuji · Nara',
-    coords: [138.2, 36.2], continent: 'Asie',
-    trips: [{ label: 'Mars 2024' }],
-    year: 2024, month: 'Mars',
-    intro: 'Le Japon au moment des cerisiers en fleur — hanami à Kyoto, Fuji sous la neige, Nara et ses daims, et Tokyo qui déborde dans tous les sens.',
-    photos: [], page: 'voyage.html?id=japon-2024', future: false
-  },
-
-  /* ── Afrique ── */
-
-  {
-    id: 'tanzanie-2024',
-    num: 31, country: 'Tanzanie', flag: '🇹🇿',
-    city: 'Kilimanjaro · Safari · Zanzibar',
-    coords: [34.9, -6.4], continent: 'Afrique',
-    trips: [{ label: 'Juil. 2024' }],
-    year: 2024, month: 'Juil.',
-    intro: 'Ascension du Kilimandjaro, safari dans le Serengeti et sur le cratère du Ngorongoro, puis Zanzibar pour souffler. L\'Afrique de l\'Est dans toute sa puissance.',
-    photos: [], page: 'voyage.html?id=tanzanie-2024', future: false
-  }
-
-];
-
-
-/* ══════════════════════════════════════════════════════
-   2. CALCUL DES STATISTIQUES
-   Tout calculé depuis VOYAGES_DATA — jamais en dur.
-   Ajouter un voyage = stats mises à jour automatiquement.
-══════════════════════════════════════════════════════ */
-
-/* ── Coordonnées de Genève (point de départ) ── */
+/* ── Coordonnées de Genève (point de départ de toutes les lignes) ── */
 const GENEVE = { lat: 46.2044, lon: 6.1432 };
+
+/* ── Lecture des variables CSS pour D3 (SVG ne lit pas var(--...) nativement) ── */
+const CSS_GOLD   = getComputedStyle(document.documentElement).getPropertyValue('--gold').trim();
+const CSS_ACCENT = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+const CSS_BG     = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
 
 /* ── Formule Haversine ──────────────────────────────
    Calcule la distance à vol d'oiseau entre deux points
-   GPS en kilomètres.
-   R = rayon de la Terre en km
+   GPS en kilomètres. R = rayon de la Terre en km.
 ────────────────────────────────────────────────── */
 function haversine(lon1, lat1, lon2, lat2) {
   const R  = 6371;
@@ -267,38 +41,77 @@ function haversine(lon1, lat1, lon2, lat2) {
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
+/* ── Vérifie si un voyage est futur ────────────────
+   Calculé automatiquement depuis date_dep.
+   Si date_dep est dans le futur → voyage à venir.
+   Si date_dep est null → considéré comme passé.
+────────────────────────────────────────────────── */
+function isFuture(voyage) {
+  if (!voyage.date_dep) return false;
+  return new Date(voyage.date_dep) > new Date();
+}
+
+/* ── Filtre les voyages publiés uniquement ──────── */
+const VOYAGES_PUBLIES = VOYAGES_DATA.filter(v => v.published);
+
+/* ── Formatte mois + année depuis une date ISO ─────
+   Ex: "2024-07-14" → "Juillet 2024"
+────────────────────────────────────────────────── */
+const MOIS_LABELS = [
+  'Janvier','Février','Mars','Avril','Mai','Juin',
+  'Juillet','Août','Septembre','Octobre','Novembre','Décembre'
+];
+
+function formatMoisAnnee(dateStr) {
+  if (!dateStr) return null;
+  const d = new Date(dateStr);
+  return `${MOIS_LABELS[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+
+/* ══════════════════════════════════════════════════════
+   2. CALCUL DES STATISTIQUES
+   Tout calculé depuis VOYAGES_PUBLIES — jamais en dur.
+   Ajouter un voyage = stats mises à jour automatiquement.
+══════════════════════════════════════════════════════ */
+
 function calculerStats() {
-  /* Nombre total de trips (pas de pays — on additionne les séjours) */
-  const totalVoyages = VOYAGES_DATA.reduce((sum, v) => sum + v.trips.length, 0);
 
-  /* Nombre de pays visités (hors futurs purs) */
-  const totalPays = VOYAGES_DATA.filter(v => !v.trips.every(t => t.future)).length;
+  /* Voyages effectués (passés) et à venir */
+  const voyagesEffectues = VOYAGES_PUBLIES.filter(v => !isFuture(v));
+  const voyagesAVenir    = VOYAGES_PUBLIES.filter(v =>  isFuture(v));
 
-  /* Nombre de continents uniques visités (hors futurs purs) */
+  /* Nombre total de voyages effectués */
+  const totalVoyages = voyagesEffectues.length;
+
+  /* Nombre de voyages à venir */
+  const totalAVenir = voyagesAVenir.length;
+
+  /* Nombre de pays uniques visités (hors futurs)
+     Un voyage "Vietnam;Cambodge" compte pour 2 pays */
+  const paysVisites = new Set(
+    voyagesEffectues.flatMap(v => v.country.split(';').map(p => p.trim()))
+  );
+  const totalPays = paysVisites.size;
+
+  /* Nombre de continents uniques visités (hors futurs) */
   const continentsVisites = new Set(
-    VOYAGES_DATA
-      .filter(v => !v.trips.every(t => t.future))
-      .map(v => v.continent)
+    voyagesEffectues.map(v => v.continent)
   );
   const totalContinents = continentsVisites.size;
 
-  /* Voyages à venir — trips avec future: true */
-  const totalAVenir = VOYAGES_DATA.reduce((sum, v) => {
-    return sum + v.trips.filter(t => t.future).length;
-  }, 0);
-
-  /* Kilomètres parcourus — aller-retour Genève × nombre de trips effectués */
-  const totalKm = VOYAGES_DATA.reduce((sum, v) => {
-    const tripsEffectues = v.trips.filter(t => !t.future).length;
-    const [lon, lat] = v.coords;
+  /* Kilomètres parcourus — aller-retour Genève
+     Utilise airport_dep_coords si disponible, sinon coords pays */
+  const totalKm = voyagesEffectues.reduce((sum, v) => {
+    const [lon, lat] = v.airport_dep_coords || v.coords;
     const dist = haversine(GENEVE.lon, GENEVE.lat, lon, lat);
-    return sum + dist * 2 * tripsEffectues; /* × 2 pour aller-retour */
+    return sum + dist * 2; /* × 2 pour aller-retour */
   }, 0);
 
   /* Arrondi au millier le plus proche */
   const totalKmArrondi = Math.round(totalKm / 1000) * 1000;
 
-  return { totalVoyages, totalPays, totalContinents, totalAVenir, totalKmArrondi };
+  return { totalVoyages, totalAVenir, totalPays, totalContinents, totalKmArrondi };
 }
 
 
@@ -313,7 +126,6 @@ function animerCompteur(el, cible, duree, prefixe, suffixe) {
   const estGrand = cible > 999; /* Pour les km : séparateur de milliers */
 
   function formater(val) {
-    /* Séparateur de milliers pour les grandes valeurs */
     const str = estGrand
       ? Math.round(val).toLocaleString('fr-CH')
       : Math.round(val).toString();
@@ -323,14 +135,11 @@ function animerCompteur(el, cible, duree, prefixe, suffixe) {
   function tick(maintenant) {
     const elapsed  = maintenant - debut;
     const progress = Math.min(elapsed / duree, 1);
-
-    /* Easing "ease-out" : démarre vite, ralentit à la fin */
+    /* Easing ease-out : démarre vite, ralentit à la fin */
     const eased = 1 - Math.pow(1 - progress, 3);
-
     el.textContent = formater(eased * cible);
-
     if (progress < 1) requestAnimationFrame(tick);
-    else el.textContent = formater(cible); /* Valeur exacte à la fin */
+    else el.textContent = formater(cible);
   }
 
   requestAnimationFrame(tick);
@@ -340,37 +149,28 @@ function initCompteurs() {
   const statsEl = document.querySelector('.voyages-stats');
   if (!statsEl) return;
 
-  /* Calculer les stats depuis VOYAGES_DATA */
   const stats = calculerStats();
 
-  /* Associer chaque stat-number à sa valeur calculée */
-  /* data-stat dans le HTML indique quelle stat afficher */
   const mapping = {
-    'voyages':    { val: stats.totalVoyages,    prefixe: '',  suffixe: ''    },
-    'pays':       { val: stats.totalPays,        prefixe: '',  suffixe: ''    },
-    'continents': { val: stats.totalContinents,  prefixe: '',  suffixe: ''    },
-    'a-venir':    { val: stats.totalAVenir,      prefixe: '',  suffixe: ''    },
-    'km':         { val: stats.totalKmArrondi,   prefixe: '~', suffixe: '' }
+    'voyages':    { val: stats.totalVoyages,    prefixe: '',  suffixe: '' },
+    'a-venir':    { val: stats.totalAVenir,      prefixe: '',  suffixe: '' },
+    'pays':       { val: stats.totalPays,        prefixe: '',  suffixe: '' },
+    'continents': { val: stats.totalContinents,  prefixe: '',  suffixe: '' },
+    'km':         { val: stats.totalKmArrondi,   prefixe: '~', suffixe: '' },
   };
 
-  /* Remplir les valeurs initiales à 0 */
   statsEl.querySelectorAll('.stat-number[data-stat]').forEach(el => {
     el.textContent = '0';
   });
 
-  /* IntersectionObserver : déclenche l'animation à l'entrée dans le viewport */
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (!entry.isIntersecting) return;
-
       statsEl.querySelectorAll('.stat-number[data-stat]').forEach(el => {
-        const key = el.dataset.stat;
-        const m   = mapping[key];
+        const m = mapping[el.dataset.stat];
         if (!m) return;
         animerCompteur(el, m.val, 1800, m.prefixe, m.suffixe);
       });
-
-      /* Ne déclencher qu'une seule fois */
       observer.unobserve(entry.target);
     });
   }, { threshold: 0.3 });
@@ -381,6 +181,8 @@ function initCompteurs() {
 
 /* ══════════════════════════════════════════════════════
    4. CARTE INTERACTIVE D3.js
+   · Points groupés par aéroport de destination
+   · Lignes animées depuis Genève vers les aéroports
    · Zoom molette + pinch mobile + drag
    · Boutons + / - / reset cliquables
    · Points à taille fixe indépendante du zoom
@@ -389,9 +191,33 @@ function initCompteurs() {
 const POINT_RADIUS        = 3;    /* Rayon point simple (1 voyage) */
 const POINT_RADIUS_MULTI  = 3;    /* Rayon point multi-voyages */
 const POINT_HOVER_RADIUS  = 7;    /* Rayon au survol */
-const HALO_RADIUS         = 0;    /* Rayon halo multi-voyages (0 = désactivé) */
+const HALO_RADIUS         = 0;    /* Rayon halo (0 = désactivé) */
 const POINT_STROKE        = 1.5;  /* Épaisseur bordure point simple */
-const POINT_STROKE_MULTI  = 1.5;    /* Épaisseur bordure point multi-voyages */
+const POINT_STROKE_MULTI  = 1.5;  /* Épaisseur bordure point multi-voyages */
+
+/* ── Regroupe les voyages par aéroport de destination ──
+   Clé = "lon,lat" de l'aéroport → tableau de voyages
+   Les voyages futurs sont inclus mais marqués différemment.
+──────────────────────────────────────────────────────── */
+function grouperParAeroport(voyages) {
+  const groupes = new Map();
+
+  voyages.forEach(v => {
+    const coords = v.airport_dep_coords || v.coords;
+    const key    = `${coords[0]},${coords[1]}`;
+
+    if (!groupes.has(key)) {
+      groupes.set(key, {
+        coords,
+        airport: v.airport_dep,
+        voyages: []
+      });
+    }
+    groupes.get(key).voyages.push(v);
+  });
+
+  return Array.from(groupes.values());
+}
 
 async function initMap() {
   const container = document.getElementById('world-map');
@@ -417,74 +243,58 @@ async function initMap() {
 
   let currentScale = 1;
 
-const zoom = d3.zoom()
-  .scaleExtent([1, 8])
-  .translateExtent([[0, 0], [W, H]])
-  .on('zoom', (event) => {
-    currentScale = event.transform.k;
-    mapGroup.attr('transform', event.transform);
-    svg.style('cursor', 'grabbing');
-    hidePopup();
+  /* ── Zoom ── */
+  const zoom = d3.zoom()
+    .scaleExtent([1, 8])
+    .translateExtent([[0, 0], [W, H]])
+    .on('zoom', (event) => {
+      currentScale = event.transform.k;
+      mapGroup.attr('transform', event.transform);
+      svg.style('cursor', 'grabbing');
+      hidePopup();
 
-    /* Contre-scaling : les points restent à taille constante visuellement */
-    mapGroup.selectAll('.voyage-point').each(function() {
-      const isMulti = d3.select(this).attr('data-multi') === 'true';
-      d3.select(this).select('.point-circle')
-        .attr('r', (isMulti ? POINT_RADIUS_MULTI : POINT_RADIUS) / currentScale);
-      d3.select(this).select('.halo-circle')
-        .attr('r', HALO_RADIUS / currentScale);
-      d3.select(this).select('.counter-text')
-        .attr('x', 7 / currentScale)
-        .attr('y', -5 / currentScale)
-        .attr('font-size', `${9 / currentScale}`);
-    });
+      /* Contre-scaling : points à taille constante visuellement */
+      mapGroup.selectAll('.voyage-point').each(function() {
+        const isMulti = d3.select(this).attr('data-multi') === 'true';
+        d3.select(this).select('.point-circle')
+          .attr('r', (isMulti ? POINT_RADIUS_MULTI : POINT_RADIUS) / currentScale);
+        d3.select(this).select('.halo-circle')
+          .attr('r', HALO_RADIUS / currentScale);
+      });
+    })
+    .on('end', () => { svg.style('cursor', 'grab'); });
 
-    /* Debug zoom — à supprimer une fois les valeurs trouvées */
-    // console.log(`scale: ${event.transform.k.toFixed(2)} | x: ${event.transform.x.toFixed(0)} | y: ${event.transform.y.toFixed(0)}`);
-  })
-  .on('end', () => { svg.style('cursor', 'grab'); });
+  svg.call(zoom);
 
-svg.call(zoom);
+  /* ── Zoom initial ── */
+  const zoomInitial = d3.zoomIdentity
+    .translate(-192, -60)
+    .scale(1.3);
 
-/* ── Zoom initial ──────────────────────────────────────
-   Définit la vue au chargement de la carte.
-   
-   scale()      → niveau de zoom (1 = monde entier, 8 = max)
-   translate()  → décalage en pixels pour centrer la vue
-                  W * 0.xx = décalage horizontal (+ = droite, - = gauche)
-                  H * 0.xx = décalage vertical   (+ = bas,   - = haut)
-    
-    >> Pour trouver les bonnes valeurs de coordonnées par défaut, 
-    décommenter la ligne console.log (Debug zoom — à supprimer une fois les valeurs trouvées)
-    et ouvrir la console. Reporter les valeurs. Par défaut :
-      const zoomInitial = d3.zoomIdentity
-        .translate(-184, -58)
-        .scale(1.3);
-────────────────────────────────────────────────────── */
-const zoomInitial = d3.zoomIdentity
-  .translate(-192, -60)  /* Centrage horizontal · vertical */
-  .scale(1.3);           /* Niveau de zoom initial */
-
-svg.call(zoom.transform, zoomInitial);
+  svg.call(zoom.transform, zoomInitial);
 
   function zoomIn()    { svg.transition().duration(300).call(zoom.scaleBy, 1.5); }
   function zoomOut()   { svg.transition().duration(300).call(zoom.scaleBy, 1 / 1.5); }
-  function zoomReset() { svg.transition().duration(500).call(zoom.transform, zoomInitial); } /* Coordonnées au clic sur le bouton réinitialisation du zoom */
+  function zoomReset() { svg.transition().duration(500).call(zoom.transform, zoomInitial); }
 
   svg.on('dblclick.zoom', null);
   svg.on('dblclick', zoomReset);
 
+  /* ── Fond cartographique ── */
   try {
-    const world = await d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json');
+    const world     = await d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json');
     const countries = topojson.feature(world, world.objects.countries);
+
     mapGroup.append('g')
       .selectAll('path')
       .data(countries.features)
       .join('path')
       .attr('d', pathGenerator)
-      .attr('fill', 'rgba(26,25,23,0.7)') /* Couleur des pays sur la map (origine : .attr('fill', '#1a1917')) */
+      .attr('fill', 'rgba(26,25,23,0.7)')
+
       .attr('stroke', '#2a2825')
-      .attr('stroke-width', 0.25); /* Epaisseur des lignes des pays */
+      .attr('stroke-width', 0.25);
+
     const graticule = d3.geoGraticule()();
     mapGroup.append('path')
       .datum(graticule)
@@ -492,22 +302,31 @@ svg.call(zoom.transform, zoomInitial);
       .attr('fill', 'none')
       .attr('stroke', 'rgba(255,255,255,0.03)')
       .attr('stroke-width', 0.5);
+
   } catch (err) {
     console.warn('Carte monde : impossible de charger les données géographiques', err);
-    mapGroup.append('rect').attr('width', W).attr('height', H).attr('fill', '#0e0d0b').attr('rx', 6);
+    mapGroup.append('rect')
+      .attr('width', W).attr('height', H)
+      .attr('fill', '#0e0d0b').attr('rx', 6);
   }
 
-  const mapRect = container;
-
-  /* ── Courbes depuis Genève vers chaque destination ── */
+  /* ── Point de départ : Genève ── */
   const geneveProj = projection([GENEVE.lon, GENEVE.lat]);
 
-  VOYAGES_DATA.forEach((voyage, i) => {
-    if (voyage.trips.every(t => t.future)) return;
+  /* ── Groupes par aéroport ── */
+  const groupes = grouperParAeroport(VOYAGES_PUBLIES);
 
-    const [px, py] = projection(voyage.coords);
+  /* ── Lignes animées depuis Genève ── */
+  groupes.forEach((groupe, i) => {
+
+    /* Ne pas tracer de ligne pour les groupes 100% futurs */
+    const aDesVoyagesPassés = groupe.voyages.some(v => !isFuture(v));
+    if (!aDesVoyagesPassés) return;
+
+    const [px, py] = projection(groupe.coords);
     if (!px || isNaN(px)) return;
 
+    /* Courbe de Bézier quadratique : point de contrôle au-dessus */
     const cx = (geneveProj[0] + px) / 2;
     const cy = Math.min(geneveProj[1], py) - 45;
 
@@ -515,66 +334,55 @@ svg.call(zoom.transform, zoomInitial);
       .attr('class', 'flight-path')
       .attr('d', `M${geneveProj[0]},${geneveProj[1]} Q${cx},${cy} ${px},${py}`)
       .attr('fill', 'none')
-      .attr('stroke', 'rgba(74,154,142,0.25)')
+      .attr('stroke', `${CSS_ACCENT}40`)
       .attr('stroke-width', 0.4);
 
     const length = line.node().getTotalLength();
+    const duree  = Math.round(length * 20); /* Durée proportionnelle à la longueur */
 
-    /* Durée proportionnelle à la longueur de la ligne
-      Les courtes lignes finissent avant les longues */
-    const duree = Math.round(length * 20);  /* Facteur ajustable */
-
-    line
-      .attr('stroke-dasharray', length)
+    line      .attr('stroke-dasharray', length)
       .attr('stroke-dashoffset', length)
       .transition()
       .duration(duree)
-      .delay(0)
       .ease(d3.easeCubicOut)
       .attr('stroke-dashoffset', 0);
 
-    /* Stocker la durée sur l'élément pour que le point puisse la lire */
     line.attr('data-duree', duree);
   });
 
-  VOYAGES_DATA.forEach((voyage, i) => {
-    const [px, py] = projection(voyage.coords);
+  /* ── Points par aéroport ── */
+  groupes.forEach((groupe, i) => {
+    const [px, py] = projection(groupe.coords);
     if (px === undefined || isNaN(px)) return;
 
-    const isMulti  = voyage.trips.length > 1;
-    const isFuture = voyage.trips.some(t => t.future);
+    const isMulti      = groupe.voyages.length > 1;
+    const tousEnFuture = groupe.voyages.every(v => isFuture(v));
+    const certainsFutur = groupe.voyages.some(v => isFuture(v));
 
     const g = mapGroup.append('g')
       .attr('class', 'voyage-point')
       .attr('data-multi', isMulti ? 'true' : 'false')
       .attr('transform', `translate(${px}, ${py})`)
-      .style('cursor', 'pointer')
-      .attr('data-id', voyage.id);
+      .style('cursor', 'pointer');
 
-    /* ── Animation : le point attend la fin de SA ligne ──
-      On lit la durée stockée sur la ligne correspondante.
-    ────────────────────────────────────────────────── */
-    const lignes = mapGroup.selectAll('.flight-path').nodes();
-    const maLigne = lignes[i];
-    const dureeLigne = maLigne ? parseInt(maLigne.getAttribute('data-duree') || 2400) : 2400;
+    /* Animation : le point attend la fin de sa ligne */
+    const lignes     = mapGroup.selectAll('.flight-path').nodes();
+    const maLigne    = lignes[i];
+    const dureeLigne = maLigne
+      ? parseInt(maLigne.getAttribute('data-duree') || 2400)
+      : 2400;
 
     g.style('opacity', 0)
       .transition()
       .duration(400)
-      .delay(dureeLigne)
+      .delay(tousEnFuture ? 0 : dureeLigne)
       .style('opacity', 1);
 
-    if (isMulti) {
-      g.append('circle')
-        .attr('class', 'halo-circle')
-        .attr('r', HALO_RADIUS)
-        .attr('fill', 'rgba(74,154,142,0.08)')
-        .attr('stroke', 'rgba(74,154,142,0.2)')
-        .attr('stroke-width', 1);
-    }
-
-    const pointColor  = isFuture ? '#c9a96e' : '#4a9a8e';
-    const strokeColor = isFuture ? 'rgba(201,169,110,0.35)' : 'rgba(74,154,142,0.35)';
+    /* Couleur selon statut */
+    const pointColor  = tousEnFuture ? CSS_GOLD : CSS_ACCENT;
+    const strokeColor = tousEnFuture
+      ? `${CSS_GOLD}59`
+      : `${CSS_ACCENT}59`;
 
     g.append('circle')
       .attr('class', 'point-circle')
@@ -583,35 +391,27 @@ svg.call(zoom.transform, zoomInitial);
       .attr('stroke', strokeColor)
       .attr('stroke-width', isMulti ? POINT_STROKE_MULTI : POINT_STROKE);
 
-/* Affiche la mention 'x2, x3, etc.' à côté des points sur la map, si les destinations ont été visitées plus d'1 x */
-/*    if (isMulti) {
-      g.append('text')
-        .attr('class', 'counter-text')
-        .attr('x', 7).attr('y', -5)
-        .attr('font-size', '9')
-        .attr('font-family', 'Inter, sans-serif')
-        .attr('font-weight', '500')
-        .attr('fill', '#4a9a8e')
-        .text(`×${voyage.trips.length}`);
-    } */
-
+    /* Clic → zoom + pop-up */
     g.on('click', function(event) {
       event.stopPropagation();
-      /* Zoom vers la destination puis affiche la pop-up */
-      const [px, py] = projection(voyage.coords);
       const zoomCible = d3.zoomIdentity
-        .translate(W / 2 - px * 3, H / 2 - py * 3)
-        .scale(3);
-        svg.transition().duration(600).call(zoom.transform, zoomCible)
-    .on('end', () => {
-      /* Recalcule la position du point après le zoom */
-      const transform = d3.zoomTransform(svg.node());
-      const [nx, ny] = transform.apply(projection(voyage.coords));
-      const fakeEvent = { clientX: nx + mapRect.getBoundingClientRect().left, clientY: ny + mapRect.getBoundingClientRect().top };
-      showPopup(fakeEvent, voyage, mapRect);
-    });
+        .translate(W / 2 - px * 5, H / 2 - py * 5)
+        .scale(5);
+
+      svg.transition().duration(600).call(zoom.transform, zoomCible)
+        .on('end', () => {
+          const transform    = d3.zoomTransform(svg.node());
+          const [nx, ny]     = transform.apply(projection(groupe.coords));
+          const containerRect = container.getBoundingClientRect();
+          const fakeEvent    = {
+            clientX: nx + containerRect.left,
+            clientY: ny + containerRect.top
+          };
+          showPopup(fakeEvent, groupe, container);
+        });
     });
 
+    /* Hover */
     g.on('mouseenter', function() {
       d3.select(this).select('.point-circle')
         .transition().duration(150)
@@ -625,27 +425,32 @@ svg.call(zoom.transform, zoomInitial);
     });
   });
 
+  /* Clic sur le fond → reset zoom + ferme pop-up */
   svg.on('click', () => {
     hidePopup();
-    /* Retour au zoom initial */
     svg.transition().duration(500).call(zoom.transform, zoomInitial);
   });
 
-  /* Légende — empilée verticalement, à droite des boutons zoom */
+  /* ── Légende ── */
   const legend = svg.append('g').attr('transform', `translate(60, ${H - 40})`);
   legend.append('circle').attr('cx', 6).attr('cy', 6).attr('r', 4).attr('fill', '#4a9a8e');
-  legend.append('text').attr('x', 16).attr('y', 10).attr('font-size', '10.4').attr('font-family', 'Inter,sans-serif').attr('fill', 'rgba(245,244,240,0.35)').text('Visité');
-  legend.append('circle').attr('cx', 6).attr('cy', 24).attr('r', 4).attr('fill', '#c9a96e');
-  legend.append('text').attr('x', 16).attr('y', 28).attr('font-size', '10.4').attr('font-family', 'Inter,sans-serif').attr('fill', 'rgba(245,244,240,0.35)').text('À venir');
-  // legend.append('circle').attr('cx', 160).attr('cy', 6).attr('r', 9).attr('fill', 'rgba(74,154,142,0.08)').attr('stroke', 'rgba(74,154,142,0.2)').attr('stroke-width', 1);
-  // legend.append('circle').attr('cx', 160).attr('cy', 6).attr('r', 4).attr('fill', '#4a9a8e');
-  // legend.append('text').attr('x', 175).attr('y', 10).attr('font-size', '10.4').attr('font-family', 'Inter,sans-serif').attr('fill', 'rgba(245,244,240,0.35)').text('Plusieurs voyages');
+  legend.append('text').attr('x', 16).attr('y', 10)
+    .attr('font-size', '10.4').attr('font-family', 'Inter,sans-serif')
+    .attr('fill', 'rgba(245,244,240,0.35)').text('Visité');
+  legend.append('circle').attr('cx', 6).attr('cy', 24).attr('r', 4).attr('fill', CSS_GOLD);
+  legend.append('text').attr('x', 16).attr('y', 28)
+    .attr('font-size', '10.4').attr('font-family', 'Inter,sans-serif')
+    .attr('fill', 'rgba(245,244,240,0.35)').text('À venir');
+
   svg.append('text')
-    .attr('x', W - 14).attr('y', H - 10).attr('text-anchor', 'end')
+    .attr('x', W - 14).attr('y', H - 10)
+    .attr('text-anchor', 'end')
     .attr('font-size', '10.4').attr('font-family', 'Inter, sans-serif')
-    .attr('letter-spacing', '0.15em').attr('fill', 'rgba(245,244,240,0.2)')
+    .attr('letter-spacing', '0.15em')
+    .attr('fill', 'rgba(245,244,240,0.2)')
     .text('Cliquez sur un point pour ouvrir le voyage');
 
+  /* ── Boutons zoom ── */
   const controls = document.createElement('div');
   controls.className = 'map-zoom-controls';
   controls.innerHTML = `
@@ -660,26 +465,37 @@ svg.call(zoom.transform, zoomInitial);
 }
 
 
-/* ── Pop-up carte ── */
-function showPopup(event, voyage, mapContainer) {
+/* ── Pop-up carte ────────────────────────────────────
+   Affiche les voyages d'un groupe d'aéroport au clic.
+   Chaque voyage est cliquable → scroll vers sa carte.
+──────────────────────────────────────────────────── */
+function showPopup(event, groupe, mapContainer) {
   const popup   = document.getElementById('map-popup');
-  const flagEl  = document.getElementById('popup-flag');
   const nameEl  = document.getElementById('popup-country');
   const tripsEl = document.getElementById('popup-trips');
 
-  flagEl.textContent = voyage.flag;
-  nameEl.textContent = voyage.country;
+  /* Nom de l'aéroport + nombre de voyages */
+  nameEl.textContent = groupe.airport || groupe.voyages[0].country;
 
-  tripsEl.innerHTML = voyage.trips.map(t => `
-    <li class="${t.future ? 'trip-future' : ''}" onclick="scrollToCard('${voyage.id}')">
-      ${t.label}
-    </li>
-  `).join('');
+  /* Liste des voyages du groupe */
+  tripsEl.innerHTML = groupe.voyages.map(v => {
+    const date    = formatMoisAnnee(v.date_dep) || v.country;
+    const futur   = isFuture(v);
+    const classe  = futur ? 'trip-future' : '';
+    return `
+      <li class="${classe}" onclick="scrollToCard('${v.id}')">
+        ${v.country} — ${date}
+      </li>
+    `;
+  }).join('');
 
+  /* Positionnement de la pop-up */
   const containerRect = mapContainer.getBoundingClientRect();
   let left = event.clientX - containerRect.left + 14;
   let top  = event.clientY - containerRect.top  - 20;
-  if (left + 230 > containerRect.width) left = event.clientX - containerRect.left - 230 - 14;
+  if (left + 230 > containerRect.width) {
+    left = event.clientX - containerRect.left - 230 - 14;
+  }
 
   popup.style.left = left + 'px';
   popup.style.top  = top  + 'px';
@@ -703,74 +519,111 @@ function scrollToCard(voyageId) {
 
 /* ══════════════════════════════════════════════════════
    5. GRILLE DES VOYAGES
+   Une carte par voyage, triée par nr décroissant
+   (plus récent en premier).
 ══════════════════════════════════════════════════════ */
 
 function renderVoyagesGrid() {
   const grid = document.getElementById('voyages-grid-container');
   if (!grid) return;
-  const sorted = [...VOYAGES_DATA].sort((a, b) => b.num - a.num);
-  grid.innerHTML = sorted.map(voyage => buildVoyageCard(voyage)).join('');
+
+  /* Tri par nr décroissant — plus récent en premier */
+  const sorted = [...VOYAGES_PUBLIES].sort((a, b) => b.nr - a.nr);
+  grid.innerHTML = sorted.map(v => buildVoyageCard(v)).join('');
 }
 
-function buildVoyageCard(voyage) {
-  const isFuture   = voyage.trips.every(t => t.future);
-  const visitCount = voyage.trips.length;
-  const visitLabel = visitCount > 1
-    ? `${visitCount} voyages · depuis ${voyage.year}`
-    : `${voyage.month ? voyage.month + ' ' : ''}${voyage.year}`;
+function buildVoyageCard(v) {
+  const futur     = isFuture(v);
+  const dateLabel = formatMoisAnnee(v.date_dep) || 'Janvier 1900';
+  const duree     = (v.date_dep && v.date_ret)
+    ? Math.round((new Date(v.date_ret) - new Date(v.date_dep)) / (1000 * 60 * 60 * 24))
+    : 0;
 
-  const mediaHTML  = buildMediaHTML(voyage);
-  const futurBadge = isFuture ? `<span class="badge-futur">Prévu</span>` : '';
+  const metaItems = [dateLabel];
+  metaItems.push(`${duree} jours`);
+  const subtitleLabel = metaItems.join(' · ');
 
-  if (isFuture) {
+  /* Étapes selon le type de voyage */
+  const isSejour = v.trip_type.every(t => t === 'Séjour');
+
+  let etapesLabel = '';
+  if (isSejour) {
+    /* Séjour : uniquement la destination */
+    const destination = v.stops && v.stops.length > 0
+      ? v.stops[0]
+      : v.airport_dep
+        ? v.airport_dep.split('(')[0].trim()
+        : '';
+    if (destination) etapesLabel = `<p class="voyage-card-etapes">${destination}</p>`;
+  } else {
+    /* Roadtrip / Safari : toutes les étapes tronquées si trop long */
+    if (v.stops && v.stops.length > 0) {
+      etapesLabel = `<p class="voyage-card-etapes">${v.stops.join(' · ')}</p>`;
+    } else {
+      etapesLabel = `<p class="voyage-card-etapes">${v.airport_dep || ''}</p>`;
+    }
+  }
+
+
+
+
+
+  const typesBadge = v.trip_type.map(t =>
+    `<span class="badge-type">${t}</span>`
+  ).join('');
+  const futurBadge = futur ? `<span class="badge-futur">À venir</span>` : '';
+  const mediaHTML  = buildMediaHTML(v);
+  const page       = `voyage.html?id=${v.id}`;
+
+  if (futur) {
     return `
-      <article class="voyage-card voyage-card--future" id="card-${voyage.id}">
+      <article class="voyage-card voyage-card--future" id="card-${v.id}">
         ${mediaHTML}
         <div class="voyage-card-body">
           <div class="voyage-card-meta">
-            <span class="voyage-card-flag">${voyage.flag}</span>
-            
+            ${futurBadge}
+            ${typesBadge}
           </div>
-          <h2 class="voyage-card-title">${voyage.country}</h2>
-          <p class="voyage-card-subtitle">${voyage.city} · ${visitLabel}</p>
+          <h2 class="voyage-card-title">${v.country.replace(/;/g, ' / ')}</h2>
+          <p class="voyage-card-subtitle">${subtitleLabel}</p>
+          ${etapesLabel}
         </div>
       </article>
     `;
   }
 
   return `
-    <a href="${voyage.page}" class="voyage-card" id="card-${voyage.id}">
+    <a href="${page}" class="voyage-card" id="card-${v.id}">
       ${mediaHTML}
       <div class="voyage-card-body">
         <div class="voyage-card-meta">
-          <span class="voyage-card-flag">${voyage.flag}</span>
-          
+          ${typesBadge}
         </div>
-        <h2 class="voyage-card-title">${voyage.country}</h2>
-        <p class="voyage-card-subtitle">${voyage.city} · ${visitLabel}</p>
+        <h2 class="voyage-card-title">${v.country.replace(/;/g, ' / ')}</h2>
+        <p class="voyage-card-subtitle">${subtitleLabel}</p>
+        ${etapesLabel}
       </div>
     </a>
   `;
 }
 
-function buildMediaHTML(voyage) {
-  if (!voyage.photos || voyage.photos.length === 0) {
+function buildMediaHTML(v) {
+  if (!v.photos || v.photos.length === 0) {
     return `
       <div class="voyage-card-media">
         <div class="voyage-card-placeholder">
-          <span class="placeholder-flag">${voyage.flag}</span>
+          <span class="placeholder-flag">${v.country.charAt(0)}</span>
         </div>
       </div>
     `;
   }
-  const randomIndex = Math.floor(Math.random() * voyage.photos.length);
-  const photo = voyage.photos[randomIndex];
+  const photo = v.photos[Math.floor(Math.random() * v.photos.length)];
   return `
     <div class="voyage-card-media">
       <img
-        class="voyage-card-img"
-        src="images/voyages/${voyage.id}/thumb/${photo}"
-        alt="${voyage.country}"
+        class="voyage-card-img active"
+        src="images/voyages/${v.id}/thumb/${photo}"
+        alt="${v.country}"
         loading="lazy"
       >
       <div class="voyage-card-overlay"></div>
