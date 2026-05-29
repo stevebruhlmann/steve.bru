@@ -6,7 +6,8 @@
 
 /* ── VARIABLES ── */
 :root {
-  --bg:           #12110f; /* #1a1917 plus clair, peut aller */
+  --bg:           #12110F;  /* Original - tire sur le brun */
+   --bg:           #111111;  /* 100% gris */
   --border:       rgba(255,255,255,0.12);
   --accent:       #4a9a8e;
   --gold:         #c9a96e;
