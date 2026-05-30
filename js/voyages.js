@@ -268,8 +268,9 @@ async function initMap() {
 
   /* ── Zoom initial ── */
   const offsetX = W < 600 ? W * -0.24 : W * -0.19;
+  const offsetY = W < 600 ? -90 : -60;
   const zoomInitial = d3.zoomIdentity
-  .translate(offsetX, -60)
+  .translate(offsetX, offsetY)
   .scale(1.3);
 
   svg.call(zoom.transform, zoomInitial);
