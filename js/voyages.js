@@ -26,6 +26,9 @@ const CSS_GOLD   = getComputedStyle(document.documentElement).getPropertyValue('
 const CSS_ACCENT = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
 const CSS_BG     = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
 
+/* Définition de la largeur à partir de laquelle et en dessous, on est sur mobile */
+const MOBILE_BREAKPOINT = 680; /* Breakpoint mobile — cohérent avec le CSS */
+
 /* ── Formule Haversine ──────────────────────────────
    Calcule la distance à vol d'oiseau entre deux points
    GPS en kilomètres. R = rayon de la Terre en km.
@@ -267,8 +270,9 @@ async function initMap() {
   svg.call(zoom);
 
   /* ── Zoom initial ── */
-  const offsetX = W < 600 ? W * -0.16 : W * -0.19; /* proche de 0 -> plus à droite */
-  const offsetY = W < 600 ? -80 : -60; /* proche de 0 -> plus haut */
+  /* W < 600 = pour mobile */
+  const offsetX = W < MOBILE_BREAKPOINT ? W * -0.19 : W * -0.19; /* proche de 0 -> la carte va à gauche */
+  const offsetY = W < MOBILE_BREAKPOINT ? -42 : -60; /* proche de 0 -> la carte descend */
   const zoomInitial = d3.zoomIdentity
   .translate(offsetX, offsetY)
   .scale(1.3);
