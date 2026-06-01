@@ -262,11 +262,11 @@ function renderGalerie(v) {
       msnry.layout();
     });
 
-  /* window resize — plus fiable que ResizeObserver sur body qui bouclait
-       quand les items changeaient de largeur et modifiaient la hauteur du body */
-    window.addEventListener('resize', () => {
+  /* On observe body et non la galerie — évite la boucle ResizeObserver :
+    modifier les items changerait la taille de la galerie et se redéclencherait */
+    new ResizeObserver(() => {
       if (appliquerLargeurs()) msnry.layout();
-    });
+    }).observe(document.body);
 
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState !== 'visible') return;
@@ -282,22 +282,6 @@ function renderGalerie(v) {
   container._items = items;
 
   container.querySelectorAll('.galerie__item').forEach(item => {
-
-    /* Overlay géré en JS — CSS :hover non fiable sur Safari après visibilitychange.
-       mouseenter/mouseleave reproduisent le même comportement de façon fiable. */
-    item.addEventListener('mouseenter', () => {
-      const overlay = item.querySelector('.galerie__overlay');
-      const icon    = item.querySelector('.galerie__overlay-icon');
-      if (overlay) overlay.style.opacity = '1';
-      if (icon)    icon.style.transform  = 'scale(1)';
-    });
-    item.addEventListener('mouseleave', () => {
-      const overlay = item.querySelector('.galerie__overlay');
-      const icon    = item.querySelector('.galerie__overlay-icon');
-      if (overlay) overlay.style.opacity = '0';
-      if (icon)    icon.style.transform  = 'scale(0.8)';
-    });
-
     item.addEventListener('click', () => {
       ouvrirLightbox(v, parseInt(item.dataset.index, 10), container._items);
     });

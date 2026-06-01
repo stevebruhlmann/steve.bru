@@ -147,8 +147,12 @@
   .galerie__item:hover {
     transform: scale(1.03); /* Scale sur le conteneur — évite les bugs Safari masonry */
   }
-  /* Overlay et icône gérés par JS (mouseenter/mouseleave) —
-     CSS :hover non fiable sur Safari après visibilitychange (retour sur l'onglet) */
+  .galerie__item:hover .galerie__overlay {
+    opacity: 1;
+  }
+  .galerie__item:hover .galerie__overlay-icon {
+    transform: scale(1);
+  }
 }
 
 /* ── Responsive ── */
