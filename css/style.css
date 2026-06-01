@@ -541,6 +541,14 @@ a {
   letter-spacing: 0.15em;
   text-transform: uppercase;
   color: rgba(245,244,240,0.15);
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+}
+
+/* Numéro de version — même style que le copyright */
+.footer-version {
+  color: rgba(245,244,240,0.15);
 }
 
 
