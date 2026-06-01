@@ -56,21 +56,23 @@
     </div>
   </div>
 
-  <!-- ══════════════════════════════════════════════════════
+<!-- ══════════════════════════════════════════════════════
        SCRIPTS — ordre important :
-         1. navbar.js   → navbar + fil d'Ariane
-         2. voyages.js  → définit VOYAGES_DATA (source unique)
-         3. voyage.js   → lit VOYAGES_DATA + rendu + lightbox
-
-       voyages.js est chargé ici SANS initialiser la carte D3
-       (initMap et renderVoyagesGrid ne s'exécutent que sur
-       voyages.html via DOMContentLoaded — aucun effet ici)
+         1. navbar.js        → navbar + fil d'Ariane
+         2. imagesloaded.js  → attend le chargement des images
+         3. masonry.js       → layout masonry
+         4. voyages_data.js  → VOYAGES_DATA (source unique)
+         5. voyages.js       → carte D3 + grille
+         6. voyage.js        → rendu + lightbox
   ══════════════════════════════════════════════════════ -->
   <script src="js/navbar.js"></script>
-  <!-- voyages_data.js doit être chargé AVANT voyages.js et voyage.js -->
-  <script src="js/voyages_data.js"></script>
-  <script src="js/voyages.js"></script>
-  <script src="js/voyage.js"></script>
+<!-- Librairies masonry — hébergées localement -->
+<script src="js/vendor/imagesloaded.pkgd.min.js"></script>
+<script src="js/vendor/masonry.pkgd.min.js"></script>
+<!-- voyages_data.js doit être chargé AVANT voyages.js et voyage.js -->
+<script src="js/voyages_data.js"></script>
+<script src="js/voyages.js"></script>
+<script src="js/voyage.js"></script>
 
 </body>
 </html>

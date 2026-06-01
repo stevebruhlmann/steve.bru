@@ -52,7 +52,22 @@ const voyageId = params.get('id');
 const voyage   = VOYAGES_DATA.find(v => v.id === voyageId);
 
 
-/* ── 3. INITIALISATION ───────────────────────────────── */
+/* ── 3. VARIABLES LIGHTBOX ───────────────────────────────
+   Déclarées ici — avant initLightbox() et renderGalerie()
+   qui en ont besoin. Les const ne sont pas hoistés en JS.
+──────────────────────────────────────────────────────── */
+
+let lbItems  = [];
+let lbIndex  = 0;
+
+const lbEl   = document.getElementById('lightbox');
+const lbImg  = document.getElementById('lightbox-img');
+const lbCpt  = document.getElementById('lightbox-counter');
+const lbPrev = document.getElementById('lightbox-prev');
+const lbNext = document.getElementById('lightbox-next');
+
+
+/* ── 4. INITIALISATION ───────────────────────────────── */
 
 if (!voyage) {
   document.getElementById('voyage-header').innerHTML = `
@@ -69,7 +84,7 @@ if (!voyage) {
 }
 
 
-/* ── 4. RENDU DE L'EN-TÊTE ───────────────────────────── */
+/* ── 5. RENDU DE L'EN-TÊTE ───────────────────────────── */
 
 function renderHeader(v) {
 
@@ -118,7 +133,7 @@ function renderHeader(v) {
 }
 
 
-/* ── 5. PLACEHOLDERS PICSUM ──────────────────────────────
+/* ── 6. PLACEHOLDERS PICSUM ──────────────────────────────
    Utilisés uniquement quand photos[] est vide.
    50 images : mix paysage et portrait.
 ──────────────────────────────────────────────────────── */
@@ -135,24 +150,41 @@ function genererPlaceholders(count) {
 }
 
 
-/* ── 6. RENDU DE LA GALERIE MASONRY ──────────────────────
-   photos[] rempli → vraies photos locales
-   photos[] vide   → 50 placeholders Picsum
+/* ── 7. RENDU DE LA GALERIE ──────────────────────────────
+   photos = nombre > 0 → vraies photos locales
+     · Nommage automatique : [id]-001.jpg, [id]-002.jpg...
+     · thumb/ pour la galerie  (800px  — chargement rapide)
+     · full/  pour la lightbox (2048px — qualité maximale)
+   photos = 0 → 50 placeholders Picsum
 ──────────────────────────────────────────────────────── */
+
+/* Génère le nom de fichier padé sur 3 chiffres — ex: 7 → "007" */
+function padNum(n) {
+  return String(n).padStart(3, '0');
+}
 
 function renderGalerie(v) {
   const container = document.getElementById('voyage-galerie');
-  const hasPhotos = v.photos && v.photos.length > 0;
+  const hasPhotos = v.photos && v.photos > 0;
 
   let items;
 
   if (hasPhotos) {
-    items = v.photos.map(photo => ({
-      src: `images/voyages/${v.id}/full/${photo}`,
-      portrait: false
-    }));
+    /* Génère la liste depuis le nombre : [id]-001.jpg ... [id]-NNN.jpg */
+    items = Array.from({ length: v.photos }, (_, i) => {
+      const filename = `${v.id}-${padNum(i + 1)}.jpg`;
+      return {
+        src:      `images/voyages/${v.id}/thumb/${filename}`, /* galerie  → thumb */
+        srcFull:  `images/voyages/${v.id}/full/${filename}`,  /* lightbox → full  */
+        portrait: false
+      };
+    });
   } else {
-    items = genererPlaceholders(50).map(p => ({ src: p.url, portrait: p.portrait }));
+    items = genererPlaceholders(50).map(p => ({
+      src:      p.url, /* Picsum — même URL pour galerie et lightbox */
+      srcFull:  p.url,
+      portrait: p.portrait
+    }));
   }
 
   const itemsHTML = items.map((item, index) => `
@@ -167,7 +199,6 @@ function renderGalerie(v) {
         class="galerie__img"
         src="${item.src}"
         alt="${v.country} — photo ${index + 1}"
-        loading="lazy"
       >
       <div class="galerie__overlay">
         <span class="galerie__overlay-icon">⤢</span>
@@ -186,6 +217,53 @@ function renderGalerie(v) {
     <div class="voyage-galerie">${itemsHTML}</div>
   `;
 
+  const galerie = container.querySelector('.voyage-galerie');
+
+/* Applique les largeurs et initialise Masonry immédiatement
+     puis recalcule le layout quand toutes les images sont chargées
+     Largeurs en pixels — plus fiable que les pourcentages
+     ResizeObserver : recalcule au resize — fiable sur Safari
+     visibilitychange : force le rerrendu au retour sur l'onglet */
+  function appliquerLargeurs() {
+    const style = getComputedStyle(galerie);
+    const w = galerie.getBoundingClientRect().width
+            - parseFloat(style.paddingLeft)
+            - parseFloat(style.paddingRight);
+    const cols = w > 800 ? Math.min(items.length, 5)
+               : w > 540 ? Math.min(items.length, 3)
+               :            Math.min(items.length, 2);
+    const px = Math.floor((w - (cols - 1) * 8) / cols);
+    galerie.querySelectorAll('.galerie__item').forEach(el => el.style.width = px + 'px');
+  }
+
+  /* requestAnimationFrame : attend que le navigateur ait calculé le layout
+     avant de lire getBoundingClientRect() — évite le flash colonne unique
+     au chargement (sans RAF, la largeur retournée est 0 ou incorrecte) */
+  requestAnimationFrame(() => {
+    appliquerLargeurs();
+
+    const msnry = new Masonry(galerie, {
+      itemSelector: '.galerie__item',
+      gutter:       8
+    });
+
+    imagesLoaded(galerie, () => msnry.layout());
+
+    /* ResizeObserver et visibilitychange sont dans le RAF :
+       msnry n'existe qu'après new Masonry(), ils en ont besoin */
+    new ResizeObserver(() => { appliquerLargeurs(); msnry.layout(); }).observe(galerie);
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState !== 'visible') return;
+      /* Safari bug : au retour sur l'onglet, l'état hover est gelé —
+         les overlays restent visibles si le curseur était sur une image.
+         On remet tous les overlays à opacity:0 pour réinitialiser proprement. */
+      galerie.querySelectorAll('.galerie__overlay').forEach(el => {
+        el.style.opacity = '0';
+      });
+    });
+  });
+
   container._items = items;
 
   container.querySelectorAll('.galerie__item').forEach(item => {
@@ -202,18 +280,9 @@ function renderGalerie(v) {
 }
 
 
-/* ── 7. LIGHTBOX ─────────────────────────────────────────
+/* ── 8. LIGHTBOX ─────────────────────────────────────────
    Fonctionne avec vraies photos ET placeholders.
 ──────────────────────────────────────────────────────── */
-
-let lbItems  = [];
-let lbIndex  = 0;
-
-const lbEl   = document.getElementById('lightbox');
-const lbImg  = document.getElementById('lightbox-img');
-const lbCpt  = document.getElementById('lightbox-counter');
-const lbPrev = document.getElementById('lightbox-prev');
-const lbNext = document.getElementById('lightbox-next');
 
 function initLightbox() {
   document.getElementById('lightbox-backdrop').addEventListener('click', fermerLightbox);
@@ -241,23 +310,46 @@ function initLightbox() {
 }
 
 function ouvrirLightbox(v, index, items) {
-  lbItems = items;
-  lbIndex = index;
-  afficherPhoto();
+  lbItems  = items;
+  lbIndex  = index;
+  const item = lbItems[lbIndex];
+
+  /* Change le src immédiatement — pas de fondu à l'ouverture */
+  lbImg.style.opacity = '0';
+  lbImg.src           = item.srcFull;
+  lbImg.alt           = `Photo ${lbIndex + 1}`;
+
+  /* Fondu entrant une fois l'image chargée */
+  lbImg.onload = () => { lbImg.style.opacity = '1'; };
+
+  /* Fallback si l'image est déjà en cache — onload ne se déclenche pas */
+  if (lbImg.complete) lbImg.style.opacity = '1';
+
+  lbCpt.textContent = `${lbIndex + 1} / ${lbItems.length}`;
+  const seule = lbItems.length <= 1;
+  lbPrev.style.display = seule ? 'none' : '';
+  lbNext.style.display = seule ? 'none' : '';
+
   lbEl.classList.add('is-open');
-  document.body.style.overflow = 'hidden';
+  /* Pas de manipulation overflow — scrollbar-gutter: stable dans style.css
+     réserve l'espace en permanence, aucun décalage possible             */
 }
 
 function fermerLightbox() {
   lbEl.classList.remove('is-open');
-  document.body.style.overflow = '';
-  setTimeout(() => { lbImg.src = ''; }, 300);
 }
 
 function afficherPhoto() {
   const item = lbItems[lbIndex];
-  lbImg.src  = item.src;
-  lbImg.alt  = `Photo ${lbIndex + 1}`;
+
+  /* Fondu sortant → change src → fondu entrant */
+  lbImg.style.opacity = '0';
+  setTimeout(() => {
+    lbImg.src = item.srcFull; /* Toujours la version full en lightbox */
+    lbImg.alt = `Photo ${lbIndex + 1}`;
+    lbImg.style.opacity = '1';
+  }, 250);
+
   lbCpt.textContent = `${lbIndex + 1} / ${lbItems.length}`;
 
   const seule = lbItems.length <= 1;

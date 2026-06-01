@@ -44,7 +44,8 @@ body {
   font-family: var(--font-body);
   font-weight: 300;
   line-height: 1.6;
-  overflow-y: scroll
+  overflow-y: scroll;
+  scrollbar-gutter: stable; /* Réserve l'espace scrollbar en permanence — évite tout décalage */
 }
 
 a {

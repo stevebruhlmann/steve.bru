@@ -101,27 +101,22 @@
   padding-left: var(--content-padding);
   padding-right: var(--content-padding);
   padding-bottom: 80px;
-
-  /* 5 colonnes sur desktop */
-  column-count: 5;
-  column-gap: 8px;
+  /* Layout géré par Masonry.js — pas de column-count CSS */
 }
 
 .galerie__item {
-  break-inside: avoid;
-  margin-bottom: 8px;
   position: relative;
   overflow: hidden;
   border-radius: 6px;
   cursor: pointer;
-  will-change: transform;
+  margin-bottom: 8px; /* Espace vertical entre photos — gutter Masonry.js */
+  /* width : absent intentionnellement — géré entièrement par JS (appliquerLargeurs) */
 }
 
 .galerie__img {
   display: block;
   width: 100%;
   height: auto;
-  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* ── Overlay hover (desktop uniquement) ── */
@@ -146,8 +141,11 @@
 }
 
 @media (hover: hover) {
-  .galerie__item:hover .galerie__img {
-    transform: scale(1.05);
+  .galerie__item {
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .galerie__item:hover {
+    transform: scale(1.03); /* Scale sur le conteneur — évite les bugs Safari masonry */
   }
   .galerie__item:hover .galerie__overlay {
     opacity: 1;
@@ -158,19 +156,8 @@
 }
 
 /* ── Responsive ── */
-
-@media (max-width: 1100px) {
-  .voyage-galerie { column-count: 4; }
-}
-
-@media (max-width: 800px) {
-  .voyage-galerie { column-count: 3; }
-}
-
 @media (max-width: 540px) {
   .voyage-galerie {
-    column-count: 2;
-    column-gap: 6px;
     padding-left: 10px;
     padding-right: 10px;
     padding-bottom: 60px;
@@ -225,7 +212,8 @@
   border-radius: 2px;
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.7);
   transform: scale(0.97);
-  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 0.25s ease; /* fondu navigation entre photos */
 }
 
 .lightbox.is-open .lightbox__img {

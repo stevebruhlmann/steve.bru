@@ -614,7 +614,8 @@ function buildVoyageCard(v) {
 }
 
 function buildMediaHTML(v) {
-  if (!v.photos || v.photos.length === 0) {
+  if (!v.photos || v.photos === 0) {
+    /* Pas encore de photos — placeholder avec première lettre du pays */
     return `
       <div class="voyage-card-media">
         <div class="voyage-card-placeholder">
@@ -623,12 +624,16 @@ function buildMediaHTML(v) {
       </div>
     `;
   }
-  const photo = v.photos[Math.floor(Math.random() * v.photos.length)];
+
+  /* Choisit une photo aléatoire parmi les N disponibles */
+  const index    = Math.floor(Math.random() * v.photos) + 1;
+  const filename = `${v.id}-${String(index).padStart(3, '0')}.jpg`;
+
   return `
     <div class="voyage-card-media">
       <img
         class="voyage-card-img active"
-        src="images/voyages/${v.id}/thumb/${photo}"
+        src="images/voyages/${v.id}/thumb/${filename}"
         alt="${v.country}"
         loading="lazy"
       >
