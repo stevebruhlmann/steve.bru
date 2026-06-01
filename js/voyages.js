@@ -250,6 +250,13 @@ async function initMap() {
   const zoom = d3.zoom()
     .scaleExtent([1, 8])
     .translateExtent([[0, 0], [W, H]])
+    .filter(event => {
+      /* Désactive le zoom à la molette et au pinch trackpad —
+         évite de bloquer le scroll de la page quand le curseur est sur la carte.
+         Le zoom reste accessible via les boutons +/− et le clic sur les points. */
+      if (event.type === 'wheel') return false;
+      return true;
+    })
     .on('zoom', (event) => {
       currentScale = event.transform.k;
       mapGroup.attr('transform', event.transform);
