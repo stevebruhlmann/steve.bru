@@ -101,7 +101,13 @@
   padding-left: var(--content-padding);
   padding-right: var(--content-padding);
   padding-bottom: 80px;
+  opacity: 0; /* Cachée pendant le chargement — apparaît en fondu via .is-ready */
+  transition: opacity 0.4s ease;
   /* Layout géré par Masonry.js — pas de column-count CSS */
+}
+
+.voyage-galerie.is-ready {
+  opacity: 1;
 }
 
 .galerie__item {

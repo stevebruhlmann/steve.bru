@@ -260,6 +260,8 @@ function renderGalerie(v) {
     imagesLoaded(galerie, () => {
       appliquerLargeurs();
       msnry.layout();
+      /* Toutes les images placées — on révèle la galerie en fondu */
+      requestAnimationFrame(() => galerie.classList.add('is-ready'));
     });
 
   /* window resize — plus fiable que ResizeObserver sur body qui bouclait
