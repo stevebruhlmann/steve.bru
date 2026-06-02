@@ -147,11 +147,11 @@
 }
 
 @media (hover: hover) {
-  .galerie__item {
+  .galerie__img {
     transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
   }
-  .galerie__item:hover {
-    transform: scale(1.03); /* Scale sur le conteneur — évite les bugs Safari masonry */
+  .galerie__item:hover .galerie__img {
+    transform: scale(1.08); /* Zoom dans la boîte — ajuste la valeur à ton goût */
   }
   /* Overlay et icône gérés par JS (mouseenter/mouseleave) —
      CSS :hover non fiable sur Safari après visibilitychange (retour sur l'onglet) */
