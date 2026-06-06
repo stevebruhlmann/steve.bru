@@ -233,7 +233,7 @@ async function initMap() {
     .append('svg')
     .attr('viewBox', `0 0 ${W} ${H}`)
     .attr('width', '100%')
-    .attr('height', H)
+    .attr('height', '100%')
     .style('cursor', 'grab');
 
   const mapGroup = svg.append('g').attr('class', 'map-group');

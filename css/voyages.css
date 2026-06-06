@@ -60,6 +60,7 @@
 #world-map {
   position: relative;
   width: 100%;
+  padding-bottom: 50%; /* Ratio 2:1 — hauteur = moitié de la largeur */
   border-radius: 8px;
   overflow: hidden;
   background: #0e0d0b;
@@ -67,8 +68,11 @@
 }
 
 #world-map svg {
-  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
+  height: 100%;
 }
 
 /* Pop-up carte */
@@ -150,7 +154,7 @@
 
 .voyages-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(3, 1fr); /* 3 colonnes desktop */
   gap: 24px;
 }
 
@@ -363,7 +367,7 @@
 
 @media (max-width: 900px) {
   .voyages-grid {
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    grid-template-columns: repeat(2, 1fr); /* 2 colonnes tablette */
     gap: 16px;
   }
 }
@@ -380,7 +384,7 @@
   }
 
   .map-section {
-    padding: 0 24px;
+    padding: 0 var(--content-padding-mobile);
     margin-bottom: 48px;
   }
 
@@ -389,7 +393,7 @@
   }
 
   .voyages-grid-section {
-    padding: 0 24px;
+    padding: 0 var(--content-padding-mobile);
   }
 
   .voyages-grid {

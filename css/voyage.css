@@ -158,10 +158,14 @@
 }
 
 /* ── Responsive ── */
-@media (max-width: 540px) {
+@media (max-width: 680px) {
+  .voyage-galerie,
+  .voyage-header,
+  .galerie__placeholder-banner {
+    padding-left: var(--content-padding-mobile);
+    padding-right: var(--content-padding-mobile);
+  }
   .voyage-galerie {
-    padding-left: 10px;
-    padding-right: 10px;
     padding-bottom: 60px;
   }
   .galerie__item {
@@ -270,7 +274,7 @@
   white-space: nowrap;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 680px) {
   .lightbox__nav { display: none; }
 }
 

@@ -221,38 +221,43 @@ function renderGalerie(v) {
   const galerie = container.querySelector('.voyage-galerie');
 
 /* Mémorise la dernière largeur de colonne appliquée —
-     permet d'ignorer les déclenchements ResizeObserver sans changement réel */
+     permet d'ignorer les déclenchements sans changement réel */
   let dernierePx = null;
-
-  /* Applique les largeurs en pixels sur chaque item.
-     Retourne true si la largeur a changé, false si identique.
-     getBoundingClientRect - padding : seule méthode fiable pour la largeur utile. */
-  function appliquerLargeurs() {
-    const style = getComputedStyle(galerie);
-    const w = galerie.getBoundingClientRect().width
-            - parseFloat(style.paddingLeft)
-            - parseFloat(style.paddingRight);
-    const cols = w > 800 ? Math.min(items.length, 5)
-               : w > 540 ? Math.min(items.length, 3)
-               :            Math.min(items.length, 2);
-    const px = Math.floor((w - (cols - 1) * 8) / cols);
-    if (px === dernierePx) return false; /* Largeur identique — rien à faire */
-    dernierePx = px;
-    galerie.querySelectorAll('.galerie__item').forEach(el => el.style.width = px + 'px');
-    return true;
-  }
 
   /* requestAnimationFrame : attend que le navigateur ait calculé le layout
      avant de lire getBoundingClientRect() — évite le flash colonne unique
      au chargement (sans RAF, la largeur retournée est 0 ou incorrecte) */
   requestAnimationFrame(() => {
+
+    /* Gutter calculé une seule fois au chargement — cohérent entre
+       appliquerLargeurs() et Masonry (6px mobile ≤ 680px, 8px desktop/tablette) */
+    let GUTTER = document.documentElement.clientWidth <= 680 ? 6 : 8;
+
+    /* Applique les largeurs en pixels sur chaque item.
+       Retourne true si la largeur a changé, false si identique.
+       getBoundingClientRect - padding : seule méthode fiable pour la largeur utile. */
+    function appliquerLargeurs() {
+      const style = getComputedStyle(galerie);
+      const w     = galerie.getBoundingClientRect().width
+                  - parseFloat(style.paddingLeft)
+                  - parseFloat(style.paddingRight);
+      const cols  = w > 800 ? Math.min(items.length, 5)
+                  : w > 540 ? Math.min(items.length, 3)
+                  :            Math.min(items.length, 2);
+      const px = Math.floor((w - (cols - 1) * GUTTER) / cols);
+      if (px === dernierePx) return false; /* Largeur identique — rien à faire */
+      dernierePx = px;
+      galerie.querySelectorAll('.galerie__item').forEach(el => el.style.width = px + 'px');
+      return true;
+    }
+
     appliquerLargeurs();
 
-/* initLayout:false — Masonry n'essaie pas de positionner avant qu'on lui dise.
+    /* initLayout:false — Masonry n'essaie pas de positionner avant qu'on lui dise.
        imagesLoaded garantit que toutes les hauteurs sont connues avant le layout. */
     const msnry = new Masonry(galerie, {
       itemSelector:       '.galerie__item',
-      gutter:             8,
+      gutter:             GUTTER,
       transitionDuration: 0,
       initLayout:         false
     });
@@ -265,10 +270,17 @@ function renderGalerie(v) {
     });
 
   /* window resize — plus fiable que ResizeObserver sur body qui bouclait
-       quand les items changeaient de largeur et modifiaient la hauteur du body */
-    window.addEventListener('resize', () => {
-      if (appliquerLargeurs()) msnry.layout();
-    });
+    quand les items changeaient de largeur et modifiaient la hauteur du body.
+    Met à jour le gutter si on franchit le breakpoint 680px (6px mobile, 8px desktop) */
+  window.addEventListener('resize', () => {
+    const nouveauGutter = document.documentElement.clientWidth <= 680 ? 6 : 8;
+    if (nouveauGutter !== GUTTER) {
+      GUTTER = nouveauGutter;
+      msnry.option({ gutter: GUTTER });
+      dernierePx = null; /* Force le recalcul des largeurs */
+    }
+    if (appliquerLargeurs()) msnry.layout();
+  });
 
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState !== 'visible') return;
