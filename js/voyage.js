@@ -42,6 +42,32 @@ function dureeVoyage(v) {
   return jours > 0 ? jours : null;
 }
 
+/* Verrouille le scroll de la page derrière un overlay (lightbox, futur modal…).
+   iOS Safari IGNORE `overflow:hidden` pour le scroll tactile inertiel : le seul
+   mécanisme fiable est de sortir le <body> du flux scrollable en position:fixed.
+   `top: -scrollY` gèle la page pile à sa position actuelle (sinon elle sauterait
+   en haut au moment du gel). Réutilisable tel quel pour tout overlay du site. */
+let scrollVerrouille = 0; /* Mémorise la position de scroll au moment du verrou */
+
+function lockScroll() {
+  scrollVerrouille = window.scrollY;
+  document.body.style.position = 'fixed';
+  document.body.style.top      = `-${scrollVerrouille}px`;
+  document.body.style.left     = '0';
+  document.body.style.right    = '0';
+}
+
+function unlockScroll() {
+  document.body.style.position = '';
+  document.body.style.top      = '';
+  document.body.style.left     = '';
+  document.body.style.right    = '';
+  
+  /* behavior:'instant' force un repositionnement immédiat, sans animation —
+     neutralise un éventuel scroll-behavior:smooth défini en CSS */
+  window.scrollTo({ top: scrollVerrouille, left: 0, behavior: 'instant' });
+}
+
 
 /* ── 2. LECTURE DE L'ID DANS L'URL ──────────────────────
    L'URL ressemble à : voyage.html?id=tanzanie-202407
@@ -377,12 +403,12 @@ function ouvrirLightbox(v, index, items) {
   lbNext.style.display = seule ? 'none' : '';
 
   lbEl.classList.add('is-open');
-  /* Pas de manipulation overflow — scrollbar-gutter: stable dans style.css
-     réserve l'espace en permanence, aucun décalage possible             */
+  lockScroll(); /* Gèle le scroll de la page derrière la lightbox (fix iOS Safari) */
 }
 
 function fermerLightbox() {
   lbEl.classList.remove('is-open');
+  unlockScroll(); /* Libère le scroll et restaure la position d'avant ouverture */
 }
 
 let afficherPhotoTimer = null; /* Référence du timer — permet d'annuler si navigation rapide */
