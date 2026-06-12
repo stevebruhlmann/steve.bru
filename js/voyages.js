@@ -632,8 +632,10 @@ function buildMediaHTML(v) {
     `;
   }
 
-  /* Choisit une photo aléatoire parmi les N disponibles */
-  const index    = Math.floor(Math.random() * v.photos) + 1;
+  /* Photo de couverture définie par le champ "cover" (numéro de photo).
+     Fallback sur 1 si cover absent. Clampé dans [1, photos] pour éviter
+     une image cassée si cover dépasse le nombre de photos disponibles. */
+  const index    = Math.min(Math.max(v.cover || 1, 1), v.photos);
   const filename = `${v.id}-${String(index).padStart(3, '0')}.jpg`;
 
   return `
