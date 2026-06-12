@@ -1,23 +1,26 @@
-/* ══════════════════════════════════════════════════════
-   steve.bru — page.css
-   Styles communs à toutes les pages secondaires
-   (voyages.html, photo.html, impression3d.html, voyage.html)
+  /* ══════════════════════════════════════════════════════
+    steve.bru — page.css
+    Styles communs à toutes les pages secondaires
+    (voyages.html, photo.html, impression3d.html, voyage.html)
 
-   Largeur et marges contrôlées par deux variables dans style.css :
-     --content-width   → largeur max du contenu (défaut 1400px)
-     --content-padding → marge gauche/droite    (défaut 40px)
+    Largeur et marges contrôlées par deux variables dans style.css :
+      --content-width   → largeur max du contenu (défaut 1400px)
+      --content-padding → marge gauche/droite    (défaut 40px)
 
-   Modifier ces deux valeurs = tout s'aligne partout.
-══════════════════════════════════════════════════════ */
+    Modifier ces deux valeurs = tout s'aligne partout.
+  ══════════════════════════════════════════════════════ */
 
 
-/* ── LOGO ── */
+  /* ── LOGO ── */
 /* Annule le position:fixed du hero screen de index.html */
 .page-secondary #site-logo {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  /* Même compensation centre optique que sur index (--logo-nudge dans style.css) —
+     garantit un logo aligné de façon identique sur toutes les pages. */
+  translate: 0 var(--logo-nudge);
   font-size: 1.8rem;
   font-family: var(--font-display);
   font-weight: 300;
@@ -31,210 +34,210 @@
   z-index: 1;
 }
 
-/* ── Lien de navigation actif — page courante ── */
-.nav-link--active {
-  color: var(--text) !important;
-}
+  /* ── Lien de navigation actif — page courante ── */
+  .nav-link--active {
+    color: var(--text) !important;
+  }
 
 
-/* ══════════════════════════════════════════════════════
-   CONTENU PRINCIPAL
-══════════════════════════════════════════════════════ */
+  /* ══════════════════════════════════════════════════════
+    CONTENU PRINCIPAL
+  ══════════════════════════════════════════════════════ */
 
-#page-content {
-  padding-top: calc(var(--nav-h) + 48px);
-  padding-bottom: 120px;
-}
+  #page-content {
+    padding-top: calc(var(--nav-h) + 48px);
+    padding-bottom: 120px;
+  }
 
-/* Bloc centré standard — utilisé par tous les blocs de contenu */
-/* Applique --content-width et --content-padding de style.css   */
-.content-block {
-  max-width: var(--content-width);
-  margin: 0 auto;
-  padding-left: var(--content-padding);
-  padding-right: var(--content-padding);
-}
-
-
-/* ══════════════════════════════════════════════════════
-   FIL D'ARIANE
-══════════════════════════════════════════════════════ */
-
-.breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding-bottom: 32px;
-
-  /* Alignement avec le reste du contenu */
-  max-width: var(--content-width);
-  margin: 0 auto;
-  padding-left: var(--content-padding);
-  padding-right: var(--content-padding);
-}
-
-.breadcrumb-home {
-  font-size: 0.7rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--muted);
-  text-decoration: none;
-  transition: color 0.2s;
-}
-
-.breadcrumb-home:hover {
-  color: var(--accent);
-}
-
-.breadcrumb-sep {
-  color: var(--muted);
-  font-size: 0.7rem;
-  opacity: 0.4;
-}
-
-.breadcrumb-current {
-  font-size: 0.7rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--text);
-}
+  /* Bloc centré standard — utilisé par tous les blocs de contenu */
+  /* Applique --content-width et --content-padding de style.css   */
+  .content-block {
+    max-width: var(--content-width);
+    margin: 0 auto;
+    padding-left: var(--content-padding);
+    padding-right: var(--content-padding);
+  }
 
 
-/* ══════════════════════════════════════════════════════
-   EN-TÊTE VOYAGES (voyages.html)
-══════════════════════════════════════════════════════ */
+  /* ══════════════════════════════════════════════════════
+    FIL D'ARIANE
+  ══════════════════════════════════════════════════════ */
 
-.page-header {
-  max-width: var(--content-width);
-  margin: 0 auto;
-  padding-left: var(--content-padding);
-  padding-right: var(--content-padding);
-  padding-bottom: 12px;
-}
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 32px;
 
-.voyages-title {
-  font-size: clamp(2.8rem, 7vw, 5rem);
-}
+    /* Alignement avec le reste du contenu */
+    max-width: var(--content-width);
+    margin: 0 auto;
+    padding-left: var(--content-padding);
+    padding-right: var(--content-padding);
+  }
 
-.voyages-intro {
-  font-size: 1rem;
-  line-height: 1.75;
-  color: var(--muted);
-  max-width: 800px;
-  margin-bottom: 40px;
-}
+  .breadcrumb-home {
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
 
-.voyages-stats {
-  display: flex;
-  align-items: stretch;
-  justify-content: space-between;
-  gap: 24px;
-}
+  .breadcrumb-home:hover {
+    color: var(--accent);
+  }
 
-.stat-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  flex: 1;
-  padding: 10px 4px;
-  background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 10px;
-  min-width: 0; /* Empêche le débordement flex */
-}
+  .breadcrumb-sep {
+    color: var(--muted);
+    font-size: 0.7rem;
+    opacity: 0.4;
+  }
 
-.stat-number {
-  font-family: var(--font-display);
-  font-size: 2rem;
-  font-weight: 300;
-  color: var(--accent);
-  line-height: 1;
-  text-align: center;
-}
-
-.stat-label {
-  font-size: 0.65rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--muted);
-  text-align: center;
-  white-space: nowrap; /* Force sur une seule  ligne */
-  overflow: hidden;
-  text-overflow: ellipsis;
-  width: 100%;
-}
-
-.stat-sep {
-  display: none;
-}
-
-/* ── Info tooltip sur les stats ── */
-.stat-info {
-  position: relative;
-  display: inline-block;
-  font-size: 0.6rem;
-  color: var(--muted);
-  cursor: default;
-  margin-left: 4px;
-  opacity: 0.6;
-}
-
-.stat-tooltip {
-  display: none;
-  position: absolute;
-  bottom: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%);
-  background: #1c1b18;
-  border: 1px solid rgba(74,154,142,0.3);
-  border-radius: 6px;
-  padding: 8px 12px;
-  font-size: 0.65rem;
-  font-style: italic;
-  color: var(--muted);
-  white-space: nowrap;
-  pointer-events: none;
-  z-index: 10;
-}
-
-.stat-info:hover .stat-tooltip {
-  display: block;
-}
-
-.page-subtitle {
-  font-family: var(--font-body);
-  font-size: 1.1rem;
-  font-weight: 300;
-  color: var(--text);
-  line-height: 1.6;
-  margin-bottom: 12px;
-}
-
-.page-body {
-  font-family: var(--font-body);
-  font-size: 0.95rem;
-  font-weight: 300;
-  color: var(--muted);
-  line-height: 1.75;
-  margin-bottom: 40px;
-}
+  .breadcrumb-current {
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text);
+  }
 
 
-/* ══════════════════════════════════════════════════════
-   RESPONSIVE — MOBILE
-══════════════════════════════════════════════════════ */
+  /* ══════════════════════════════════════════════════════
+    EN-TÊTE VOYAGES (voyages.html)
+  ══════════════════════════════════════════════════════ */
 
-@media (max-width: 680px) {
-  .breadcrumb,
   .page-header {
-    padding-left: var(--content-padding-mobile);
-    padding-right: var(--content-padding-mobile);
-  } 
+    max-width: var(--content-width);
+    margin: 0 auto;
+    padding-left: var(--content-padding);
+    padding-right: var(--content-padding);
+    padding-bottom: 12px;
+  }
+
+  .voyages-title {
+    font-size: clamp(2.8rem, 7vw, 5rem);
+  }
+
+  .voyages-intro {
+    font-size: 1rem;
+    line-height: 1.75;
+    color: var(--muted);
+    max-width: 800px;
+    margin-bottom: 40px;
+  }
 
   .voyages-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    gap: 24px;
   }
-}
+
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    padding: 10px 4px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    min-width: 0; /* Empêche le débordement flex */
+  }
+
+  .stat-number {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 300;
+    color: var(--accent);
+    line-height: 1;
+    text-align: center;
+  }
+
+  .stat-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: center;
+    white-space: nowrap; /* Force sur une seule  ligne */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+  }
+
+  .stat-sep {
+    display: none;
+  }
+
+  /* ── Info tooltip sur les stats ── */
+  .stat-info {
+    position: relative;
+    display: inline-block;
+    font-size: 0.6rem;
+    color: var(--muted);
+    cursor: default;
+    margin-left: 4px;
+    opacity: 0.6;
+  }
+
+  .stat-tooltip {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1c1b18;
+    border: 1px solid rgba(74,154,142,0.3);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 0.65rem;
+    font-style: italic;
+    color: var(--muted);
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  .stat-info:hover .stat-tooltip {
+    display: block;
+  }
+
+  .page-subtitle {
+    font-family: var(--font-body);
+    font-size: 1.1rem;
+    font-weight: 300;
+    color: var(--text);
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+
+  .page-body {
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    font-weight: 300;
+    color: var(--muted);
+    line-height: 1.75;
+    margin-bottom: 40px;
+  }
+
+
+  /* ══════════════════════════════════════════════════════
+    RESPONSIVE — MOBILE
+  ══════════════════════════════════════════════════════ */
+
+  @media (max-width: 680px) {
+    .breadcrumb,
+    .page-header {
+      padding-left: var(--content-padding-mobile);
+      padding-right: var(--content-padding-mobile);
+    } 
+
+    .voyages-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+  }

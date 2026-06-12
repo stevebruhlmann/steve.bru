@@ -36,54 +36,17 @@ document.addEventListener('navbar-ready', () => {
 
 
 // ══════════════════════════════════════════════════════
-// NAVBAR RESPONSIVE — 3 états automatiques
-//
-// Le logo est toujours position:fixed, jamais dans le flux.
-// Le placeholder (#nav-logo-placeholder) occupe sa place
-// dans le flexbox et permet des calculs de position fiables.
-//
-// État 1 — Normal  : tout tient sur une ligne (> 680px)
-// État 2 — Stacked : nav-left chevauche le placeholder
-//                    → liens passent sur la ligne du dessous
-// État 3 — Compact : ≤ 680px (breakpoint fixe, cohérent CSS)
-//                    → hamburger uniquement
-//
-// Définie ici en premier car appelée dans le bloc alreadySeen ci-dessous.
-// ══════════════════════════════════════════════════════
-
- function checkNavOverflow() {
-  if (!navLeft.classList.contains('visible')) return;
-
-  // Réinitialise pour mesurer en état normal
-  navbar.classList.remove('stacked', 'compact');
-
-  /* Breakpoint fixe — cohérent avec le CSS (--content-padding-mobile) */
-  if (document.documentElement.clientWidth <= 680) {
-    navbar.classList.add('compact');
-    return;
-  }
-
-  const leftRect  = navLeft.getBoundingClientRect();
-  const rightRect = navRight.getBoundingClientRect();
-  const logoRect  = logo.getBoundingClientRect();
-
-  // Chevauchement : nav-left empiète sur le logo, ou nav-right empiète sur le logo
-  const overlapLeft  = leftRect.right  > logoRect.left;
-  const overlapRight = rightRect.left  < logoRect.right;
-
-  if (overlapLeft || overlapRight) {
-    navbar.classList.add('stacked');
-
-    const neededStacked = navLeft.scrollWidth + navRight.scrollWidth + 80;
-    if (neededStacked > navbar.getBoundingClientRect().width) {
-      navbar.classList.remove('stacked');
-      navbar.classList.add('compact');
-    }
-  }
-}
-
-  // Appel à chaque resize de fenêtre
-  window.addEventListener('resize', checkNavOverflow, { passive: true });
+  // NAVBAR RESPONSIVE — 3 états automatiques
+  //
+  // La fonction checkNavOverflow() et son listener 'resize' vivent
+  // désormais dans navbar.js (navbar centralisée → source unique,
+  // disponible sur toutes les pages). Voir le commentaire détaillé
+  // des 3 états (Normal / Stacked / Compact) dans navbar.js.
+  //
+  // Ici, sur index.html, on se contente d'APPELER checkNavOverflow()
+  // au bon moment : une fois l'animation d'intro terminée et les liens
+  // de la navbar rendus visibles (voir les appels plus bas dans ce fichier).
+  // ══════════════════════════════════════════════════════
 
 
   // ══════════════════════════════════════════════════════

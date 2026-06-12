@@ -6,8 +6,7 @@
 
 /* ── VARIABLES ── */
 :root {
-  --bg:                     #12110F;  /* Original - tire sur le brun */
-   --bg:                    #111111;  /* 100% gris */
+  --bg:                     #111111;  /* Gris pur — couleur de fond définitive (tranchée P10) */
   --border:                 rgba(255,255,255,0.12);
   --accent:                 #4a9a8e;
   --gold:                   #c9a96e;
@@ -16,6 +15,10 @@
   --font-display:           'Cormorant Garamond', Georgia, serif;
   --font-body:              'Inter', system-ui, sans-serif;
   --nav-h:                  64px;
+  --logo-nudge:             -5px;  /* Compensation du centre optique de Cormorant Garamond
+                                      à 1.8rem — recentre le logo dans la navbar. Source unique
+                                      utilisée partout où le logo est calé (in-nav, mobile, pages
+                                      secondaires). Si tu changes de police/taille → re-mesurer. */
   --transition:             0.55s cubic-bezier(0.22, 1, 0.36, 1);
   --content-width:          1100px;  /* Largeur max du contenu sur toutes les pages */
   --content-padding:        40px;   /* Marge gauche/droite desktop/tablette — modifier ici = change partout */
@@ -145,6 +148,10 @@ a {
   top: calc(var(--nav-h) / 2);
   left: 50%;
   transform: translate(-50%, -50%);
+  /* Compensation centre optique police — voir --logo-nudge dans :root.
+     translate (propriété individuelle) se compose par-dessus le transform
+     ci-dessus sans le remplacer. */
+  translate: 0 var(--logo-nudge);
   cursor: pointer;
 }
 
@@ -243,6 +250,8 @@ a {
 .nav-left,
 .nav-right {
   display: flex;
+  align-items: center; /* Centre liens ET séparateurs sur le même axe vertical —
+                          sinon le séparateur │, plus haut, décale l'alignement */
   gap: 32px;
   opacity: 0;
   transition: opacity 0.55s ease;
@@ -318,7 +327,7 @@ a {
   height: auto;
   min-height: var(--nav-h);
   padding: 14px var(--content-padding);
-  row-gap: 10px;
+  row-gap: 25px; /* Espace entre steve.bru et les liens dans la navbar, lorsqu'ils sont sur 2 lignes */
   align-items: center;
 }
 
@@ -335,12 +344,21 @@ a {
   flex-basis: 100%;
 }
 
+/* order : place le placeholder (logo) en premier visuellement (ligne 1),
+   puis nav-left et nav-right ensemble sur la ligne 2 — indépendamment de
+   l'ordre HTML. flex-wrap + placeholder à 100% forcent le saut de ligne. */
+#navbar.stacked #nav-logo-placeholder {
+  order: 1;
+}
+
 #navbar.stacked .nav-left {
+  order: 2;
   flex: 1;
   flex-basis: auto;
 }
 
 #navbar.stacked .nav-right {
+  order: 3;
   flex: 1;
   justify-content: flex-end;
 }
@@ -586,12 +604,15 @@ a {
     opacity: 1;
   }
 
-  /* Le logo garde toujours 1.8rem — pas de réduction sur mobile */
+  /* Le logo garde toujours 1.8rem — pas de réduction sur mobile.
+     translate explicite ici aussi : ce bloc réécrit transform, on rappelle
+     donc la compensation (--logo-nudge) pour rester lisible et autonome. */
   #site-logo.in-nav {
     font-size: 1.8rem;
     top: calc(var(--nav-h) / 2);
     left: 50%;
     transform: translate(-50%, -50%);
+    translate: 0 var(--logo-nudge);
   }
 
   #site-logo {

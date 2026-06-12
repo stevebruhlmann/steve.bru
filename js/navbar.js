@@ -90,15 +90,87 @@ async function loadNavbar() {
       if (pageContent) pageContent.insertBefore(breadcrumb, pageContent.firstChild);
     }
 
-    /* ── Initialisation du menu mobile ── */
+/* ── Initialisation du menu mobile ── */
     /* Après injection, les éléments existent dans le DOM */
     initMobileMenu();
+
+    /* ── Navbar responsive — branchement ──
+       Listener resize unique pour TOUTES les pages (source unique).
+       1er appel : uniquement sur les pages secondaires, où les liens
+       sont déjà visibles (classe 'visible' posée plus haut). Sur index.html,
+       les liens n'apparaissent qu'après l'animation d'intro → c'est main.js
+       qui déclenche le 1er appel à ce moment-là.
+       requestAnimationFrame : on mesure après que le navigateur a calculé
+       le layout de la navbar fraîchement injectée. */
+    window.addEventListener('resize', checkNavOverflow, { passive: true });
+    if (!isIndex) {
+      requestAnimationFrame(checkNavOverflow);
+    }
 
     /* Signale à main.js que la navbar est prête dans le DOM */
     document.dispatchEvent(new Event('navbar-ready'));
 
   } catch (err) {
     console.error('Erreur chargement navbar :', err);
+  }
+}
+
+
+/* ══════════════════════════════════════════════════════
+   NAVBAR RESPONSIVE — 3 états automatiques (source unique)
+
+   Pilote la bascule entre les 3 états de la navbar selon la place
+   disponible. Définie ici (navbar centralisée) et non dans main.js,
+   pour être disponible sur TOUTES les pages — main.js ne charge que
+   sur index.html. Sur index, c'est main.js qui appelle cette fonction
+   après l'animation d'intro (seul moment où les liens sont visibles).
+
+   Le logo est toujours position:fixed (hors flux). On mesure le
+   chevauchement réel entre les liens (nav-left / nav-right) et le logo.
+
+   État 1 — Normal  : tout tient sur une ligne (pas de chevauchement)
+   État 2 — Stacked : les liens chevauchent le logo → passent sous le logo
+   État 3 — Compact : ≤ 680px OU stacked encore trop large → hamburger seul
+
+   Éléments relus à chaque appel (getElementById) : la navbar est injectée
+   dynamiquement, cette approche évite toute référence périmée.
+══════════════════════════════════════════════════════ */
+
+function checkNavOverflow() {
+  const navbar   = document.getElementById('navbar');
+  const navLeft  = document.getElementById('nav-left');
+  const navRight = document.getElementById('nav-right');
+  const logo     = document.getElementById('site-logo');
+
+  /* Navbar pas encore injectée ou élément absent — rien à faire */
+  if (!navbar || !navLeft || !navRight || !logo) return;
+
+  /* Liens pas encore révélés (animation intro index.html en cours) */
+  if (!navLeft.classList.contains('visible')) return;
+
+  /* Réinitialise pour mesurer en état normal */
+  navbar.classList.remove('stacked', 'compact');
+
+  /* Breakpoint fixe — cohérent avec le CSS (--content-padding-mobile) */
+  if (document.documentElement.clientWidth <= 680) {
+    navbar.classList.add('compact');
+    return;
+  }
+
+  const leftRect  = navLeft.getBoundingClientRect();
+  const rightRect = navRight.getBoundingClientRect();
+  const logoRect  = logo.getBoundingClientRect();
+
+  /* Chevauchement : nav-left empiète sur le logo, ou nav-right empiète dessus */
+  const overlapLeft  = leftRect.right > logoRect.left;
+  const overlapRight = rightRect.left < logoRect.right;
+
+  /* Chevauchement détecté → état STACKED (liens sous le logo).
+     Aucune escalade vers compact ici : le passage en hamburger est piloté
+     UNIQUEMENT par le breakpoint mobile (≤ 680px) plus haut. Comportement
+     prévisible — entre l'overlap et 680px, les liens restent sous le logo. */
+  if (overlapLeft || overlapRight) {
+    navbar.classList.add('stacked');
   }
 }
 
