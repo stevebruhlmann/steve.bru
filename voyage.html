@@ -27,14 +27,22 @@
   <!-- Navbar centralisée — injectée par navbar.js via fetch() -->
   <div id="navbar-container"></div>
 
-  <!-- ══════════════════════════════════════════════════════
+<!-- ══════════════════════════════════════════════════════
        CONTENU PRINCIPAL
-       Tout est généré dynamiquement par voyage.js
-       selon l'id passé dans l'URL : voyage.html?id=tanzanie-2024
+       Template générique : sert n'importe quel voyage selon l'id
+       passé dans l'URL — voyage.html?id=[id-du-voyage]
+       (ex. de format : pays-AAAAMM). Tout le contenu est généré
+       dynamiquement par voyage.js depuis VOYAGES_DATA.
   ══════════════════════════════════════════════════════ -->
   <main id="page-content">
 
-    <!-- En-tête du voyage (titre, pays, date, intro) -->
+    <!-- Hero pleine largeur (full-bleed) — photo de couverture + titre & badges
+         en surimpression. Généré par voyage.js (renderHero) à partir du champ
+         `cover` du voyage. Se place sous le fil d'Ariane (injecté par navbar.js). -->
+    <div id="voyage-hero"></div>
+
+    <!-- En-tête du voyage (meta, étapes, intro).
+         Le titre et les badges sont désormais affichés dans le hero ci-dessus. -->
     <div id="voyage-header"></div>
 
     <!-- Galerie masonry de toutes les photos du voyage -->

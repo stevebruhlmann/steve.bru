@@ -2,10 +2,15 @@
    steve.bru — voyage.js
    Logique de la page dédiée d'un voyage (voyage.html)
    Contient :
-     1. Lecture de l'id dans l'URL (?id=tanzanie-202407)
-     2. Rendu de l'en-tête (titre, meta, type, intro)
-     3. Rendu de la galerie masonry
-     4. Lightbox (ouverture, navigation, swipe, clavier)
+     1. Utilitaires (dates, durée, scroll-lock)
+     2. Lecture de l'id dans l'URL (?id=...)
+     3. Variables lightbox
+     4. Initialisation
+     5. Rendu de l'en-tête (meta, étapes, intro)
+     6. Rendu du hero (photo de couverture ou motif + titre/badges)
+     7. Placeholders Picsum
+     8. Rendu de la galerie masonry
+     9. Lightbox (ouverture, navigation, swipe, clavier)
 
    IMPORTANT : voyage.html charge voyages_data.js AVANT ce fichier.
    VOYAGES_DATA est donc déjà disponible — pas de duplication.
@@ -104,6 +109,7 @@ if (!voyage) {
   `;
 } else {
   document.title = `${voyage.country} — steve.bru`;
+  renderHero(voyage);
   renderHeader(voyage);
   renderGalerie(voyage);
   initLightbox();
@@ -121,15 +127,8 @@ function renderHeader(v) {
   const duree      = dureeVoyage(v);
   const dureeLabel = duree ? `${duree} jours` : '';
 
-  /* Badge futur */
-  const badgeFutur = isFuture(v)
-    ? `<span class="voyage-badge-futur">Prévu</span>`
-    : '';
-
-  /* Badges type de voyage (Séjour / Roadtrip / Safari) */
-  const badgesType = v.trip_type.map(t =>
-    `<span class="voyage-badge-type">${t}</span>`
-  ).join('');
+  /* NB : badges (type + futur) et titre sont désormais rendus dans le hero
+     (renderHero) — retirés d'ici pour éviter le doublon. */
 
   /* Étapes — affichées si disponibles */
   const etapesHTML = v.stops && v.stops.length > 0
@@ -138,13 +137,6 @@ function renderHeader(v) {
 
   document.getElementById('voyage-header').innerHTML = `
     <div class="voyage-header">
-
-      <div class="voyage-header-badges">
-        ${badgesType}
-        ${badgeFutur}
-      </div>
-
-      <h1 class="voyage-title section-title">${v.country.replace(/;/g, ' / ')}</h1>
 
       <div class="voyage-meta">
         <span>${dateLabel}</span>
@@ -159,7 +151,49 @@ function renderHeader(v) {
 }
 
 
-/* ── 6. PLACEHOLDERS PICSUM ──────────────────────────────
+/* ── 6. RENDU DU HERO ────────────────────────────────────
+   Bannière pleine largeur en haut de page : photo de couverture
+   (ou motif topographique si le voyage n'a pas encore de photos),
+   avec le titre du pays et les badges en surimpression.
+   L'image vient de getCoverUrl() — source unique partagée avec la grille.
+──────────────────────────────────────────────────────── */
+
+function renderHero(v) {
+
+  /* Image de couverture : vraie photo (full) ou null → motif topographie */
+  const coverUrl = getCoverUrl(v);
+
+  /* Badge "Prévu" pour un voyage futur (même règle que l'en-tête) */
+  const badgeFutur = isFuture(v)
+    ? `<span class="voyage-badge-futur">Prévu</span>`
+    : '';
+
+  /* Badges type de voyage (Séjour / Roadtrip / Safari) */
+  const badgesType = v.trip_type.map(t =>
+    `<span class="voyage-badge-type">${t}</span>`
+  ).join('');
+
+  /* Classe + style selon la présence d'une photo :
+     - photo → fond image inline (l'URL est une donnée, donc en JS)
+     - sinon → classe motif (le fond topographie est géré 100% en CSS) */
+  const classeFond = coverUrl ? 'voyage-hero--photo' : 'voyage-hero--motif';
+  const styleFond  = coverUrl ? `style="background-image: url('${coverUrl}')"` : '';
+
+  document.getElementById('voyage-hero').innerHTML = `
+    <div class="voyage-hero ${classeFond}" ${styleFond}>
+      <div class="voyage-hero__content">
+        <h1 class="voyage-hero__title">${v.country.replace(/;/g, ' / ')}</h1>
+        <div class="voyage-hero__badges">
+          ${badgesType}
+          ${badgeFutur}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+
+/* ── 7. PLACEHOLDERS PICSUM ──────────────────────────────
    Utilisés uniquement quand photos[] est vide.
    50 images : mix paysage et portrait.
 ──────────────────────────────────────────────────────── */
@@ -176,7 +210,7 @@ function genererPlaceholders(count) {
 }
 
 
-/* ── 7. RENDU DE LA GALERIE ──────────────────────────────
+/* ── 8. RENDU DE LA GALERIE ──────────────────────────────
    photos = nombre > 0 → vraies photos locales
      · Nommage automatique : [id]-001.jpg, [id]-002.jpg...
      · thumb/ pour la galerie  (800px  — chargement rapide)
@@ -187,6 +221,19 @@ function genererPlaceholders(count) {
 /* Génère le nom de fichier padé sur 3 chiffres — ex: 7 → "007" */
 function padNum(n) {
   return String(n).padStart(3, '0');
+}
+
+/* Retourne l'URL de la photo de couverture d'un voyage, ou null si aucune photo.
+   Utilisé par le hero (renderHero). Réutilise le champ `cover` de VOYAGES_DATA,
+   clampé dans [1, photos] — même garde-fou que la vignette de la grille (voyages.js),
+   donc impossible d'avoir une image cassée même si `cover` dépasse le nombre réel.
+   Version `full/` (2048px) car le hero est grand ; le motif topographie prend
+   le relais quand il n'y a pas de photo (null). */
+function getCoverUrl(v) {
+  if (!v.photos || v.photos <= 0) return null;        /* Pas de photo → motif */
+  const index    = Math.min(Math.max(v.cover || 1, 1), v.photos);
+  const filename = `${v.id}-${padNum(index)}.jpg`;
+  return `images/voyages/${v.id}/full/${filename}`;
 }
 
 function renderGalerie(v) {
@@ -351,7 +398,7 @@ function renderGalerie(v) {
 }
 
 
-/* ── 8. LIGHTBOX ─────────────────────────────────────────
+/* ── 9. LIGHTBOX ─────────────────────────────────────────
    Fonctionne avec vraies photos ET placeholders.
 ──────────────────────────────────────────────────────── */
 

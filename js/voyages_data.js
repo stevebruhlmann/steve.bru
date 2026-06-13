@@ -2,7 +2,7 @@
  * VOYAGES_DATA — Données centralisées de tous les voyages
  * Utilisé par : voyages.js (carte D3, grille) et voyage.js (page dédiée)
  * Structure   : une entrée par voyage, triée par ordre chronologique (nr)
- * Source      : VOYAGES_DATA_v1_3.xlsx — éditer le xlsx, puis regénérer ce fichier
+ * Source      : VOYAGES_DATA_v1.3.xlsx — éditer le xlsx, puis regénérer ce fichier
  *
  * Champs :
  *   nr                 — numéro chronologique du voyage

@@ -1,14 +1,12 @@
 /* ============================================================
-   voyage.css — Styles de la page dédiée d'un voyage
-   Contient :
+voyage.css — Styles de la page dédiée d'un voyage
+Contient :
      1. En-tête du voyage
-     2. Galerie masonry (5 col desktop → 3 tablette → 2 mobile)
-     3. Effets hover sur les photos
-     4. Lightbox
-     5. Banner placeholder
-
-   Marges alignées via --content-width et --content-padding
-   définis dans style.css — même valeurs que page.css.
+     2. Hero pleine largeur (full-bleed)
+     3. Banner placeholder
+     4. Galerie masonry (5 col desktop → 3 tablette → 2 mobile)
+        (inclut les effets hover sur les photos)
+     5. Lightbox
    ============================================================ */
 
 
@@ -77,7 +75,130 @@
 }
 
 
-/* ── 2. BANNER PLACEHOLDER ───────────────────────────────── */
+/* ── 2. HERO PLEINE LARGEUR (full-bleed) ─────────────────────
+   Bannière d'ouverture : photo de couverture + titre & badges
+   en surimpression. Pleine largeur (#page-content n'a pas de
+   max-width — les enfants se centrent eux-mêmes).
+   L'image est posée en background-image par voyage.js (renderHero),
+   qui injecte aussi le titre et les badges.
+──────────────────────────────────────────────────────────── */
+
+.voyage-hero {
+  position: relative;               /* Référence pour le dégradé (::after) et le contenu */
+  width: 100%;
+  height: clamp(260px, 40vh, 410px); /* Fluide : 40vh borné entre 260px et 410px (~2/3 de l'ancienne hauteur) */
+  margin-bottom: 36px;
+  background-size: cover;            /* L'image remplit le cadre, recadrée au centre */
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: flex-end;            /* Le contenu (titre) se cale en bas */
+  overflow: hidden;
+  /* Ombre portée sous le hero — détache la bannière du fond du site.
+     RÉGLAGE : le 24px = étalement vertical de l'ombre (monte pour plus diffus) ;
+     le 0.55 = intensité (baisse pour plus subtil). */
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 2);
+}
+
+/* Cas 1 — vraie photo : l'URL est posée en inline par voyage.js (renderHero).
+   La couleur de fond sert de fallback le temps que la photo charge. */
+.voyage-hero--photo {
+  background-color: #0e0d0b;
+}
+
+/* Cas 2 — pas de photo : fond anthracite + motif topographique discret.
+   background-size NON défini ici → le motif garde son ratio (preserveAspectRatio
+   "slice" dans le SVG le fait remplir le cadre proprement, recadré au centre).
+   Pour rendre le motif plus/moins discret : ajuster l'opacité du SVG ou
+   superposer un voile via background-color. */
+.voyage-hero--motif {
+  background-color: #141312;
+  background-image: url('../images/motifs/topographie.svg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.voyage-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+/* Dégradé progressif en % → s'adapte AUTOMATIQUEMENT à la hauteur du hero
+     (desktop comme mobile). Une seule définition, aucun @media nécessaire.
+     Paliers progressifs = aucune ligne de coupure visible.
+     ───────────────────────────────────────────────────────────────
+     RÉGLAGE INTENSITÉ : les alphas (dernier nombre de chaque rgba).
+       · 0.62 en bas = assombrissement max (baisse vers 0.50 pour plus clair)
+       · 0.30 au milieu = zone des badges
+     RÉGLAGE ÉTENDUE : les % (jusqu'où le dégradé monte). Monte le "70%"
+     pour étendre plus haut, baisse-le pour concentrer en bas. */
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.62) 0%,
+    rgba(0, 0, 0, 0.30) 35%,
+    rgba(0, 0, 0, 0.10) 55%,
+    rgba(0, 0, 0, 0)    70%
+  );
+  pointer-events: none;            /* Le dégradé ne bloque pas les clics */
+}
+
+/* Contenu du hero (titre + badges) — au-dessus du dégradé (z-index),
+   aligné sur la grille de contenu standard du site. */
+.voyage-hero__content {
+  position: relative;
+  z-index: 1;                      /* Passe devant le ::after */
+  width: 100%;
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding-left: var(--content-padding);
+  padding-right: var(--content-padding);
+  padding-bottom: 32px;
+}
+
+/* Titre du voyage dans le hero — blanc pur pour le contraste sur photo */
+.voyage-hero__title {
+  font-family: var(--font-display);
+  font-size: clamp(2.6rem, 6vw, 4.4rem);
+  font-weight: 300;
+  color: #ffffff;
+  line-height: 1;
+  margin: 12px 0 0;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.5); /* Renfort de lisibilité */
+}
+
+/* Rangée de badges (type + futur) dans le hero */
+.voyage-hero__badges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* Fond foncé semi-opaque DERRIÈRE les badges — uniquement dans le hero.
+   Cible précise (.voyage-hero__badges …) → les badges des autres contextes
+   ne sont pas affectés. Améliore le contraste sur photo claire.
+   ───────────────────────────────────────────────────────────────
+   RÉGLAGE : le dernier nombre de rgba (0.45) = opacité du fond noir.
+   Monte-le vers 0.65 pour un fond plus foncé, baisse-le pour plus discret. */
+.voyage-hero__badges .voyage-badge-type,
+.voyage-hero__badges .voyage-badge-futur {
+  background: rgba(0, 0, 0, 0.40);
+}
+
+/* Responsive mobile — hero plus court pour ne pas noyer le contenu */
+@media (max-width: 680px) {
+  .voyage-hero {
+    height: clamp(220px, 33vh, 310px);
+    margin-bottom: 28px;
+  }
+  .voyage-hero__content {
+    padding-left: var(--content-padding-mobile);
+    padding-right: var(--content-padding-mobile);
+    padding-bottom: 24px;
+  }
+}
+
+
+/* ── 3. BANNER PLACEHOLDER ───────────────────────────────── */
 
 .galerie__placeholder-banner {
   max-width: var(--content-width);
@@ -93,7 +214,7 @@
 }
 
 
-/* ── 3. GALERIE MASONRY ──────────────────────────────────── */
+/* ── 4. GALERIE MASONRY ──────────────────────────────────── */
 
 .voyage-galerie {
   max-width: var(--content-width);
@@ -174,7 +295,7 @@
 }
 
 
-/* ── 4. LIGHTBOX ─────────────────────────────────────────── */
+/* ── 5. LIGHTBOX ─────────────────────────────────────────── */
 
 .lightbox {
   position: fixed;
