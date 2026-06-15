@@ -177,15 +177,26 @@ function renderHero(v) {
      - photo → fond image inline (l'URL est une donnée, donc en JS)
      - sinon → classe motif (le fond topographie est géré 100% en CSS) */
   const classeFond = coverUrl ? 'voyage-hero--photo' : 'voyage-hero--motif';
-  const styleFond  = coverUrl ? `style="background-image: url('${coverUrl}')"` : '';
+
+  /* Cadrage vertical de la photo de couverture.
+     `cover_pos` (donnée par voyage) = position VERTICALE en % : 0% = haut de
+     la photo, 50% = milieu (défaut), 100% = bas. L'horizontal reste centré.
+     Réglable photo par photo dans voyages_data.js ; absent → '50%' (mi-hauteur).
+     Format final injecté : "center <Y>" (horizontal centré, vertical piloté). */
+  const coverPos  = v.cover_pos || '50%';
+  const styleFond = coverUrl
+    ? `style="background-image: url('${coverUrl}'); background-position: center ${coverPos};"`
+    : '';
 
   document.getElementById('voyage-hero').innerHTML = `
     <div class="voyage-hero ${classeFond}" ${styleFond}>
       <div class="voyage-hero__content">
-        <h1 class="voyage-hero__title">${v.country.replace(/;/g, ' / ')}</h1>
-        <div class="voyage-hero__badges">
-          ${badgesType}
-          ${badgeFutur}
+        <div class="voyage-hero__titlerow">
+          <h1 class="voyage-hero__title">${v.country.replace(/;/g, ' / ')}</h1>
+          <div class="voyage-hero__badges">
+            ${badgesType}
+            ${badgeFutur}
+          </div>
         </div>
       </div>
     </div>
