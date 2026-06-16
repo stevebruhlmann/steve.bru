@@ -133,24 +133,44 @@ body.has-hero .breadcrumb-current {
   width: 100%;
   height: clamp(260px, 40vh, 410px); /* Fluide : 40vh borné entre 260px et 410px (~2/3 de la hauteur initiale) */
   margin-bottom: 36px;
-  background-size: cover;            /* L'image remplit le cadre */
-  /* background-position : PAS défini ici — il est posé en inline par voyage.js
-     (renderHero) à partir du champ `cover_pos` du voyage. Défaut JS : "center 50%"
-     (centré horizontalement, mi-hauteur verticalement). Réglable par voyage. */
+  /* NB : la PHOTO n'est plus posée ici — elle vit sur la couche enfant
+     .voyage-hero__media (voir plus bas). Les background-* ci-dessous ne servent
+     plus qu'au cas SANS photo (classe --motif), qui pose son image sur le hero. */
+  background-size: cover;            /* Utilisé par le motif (--motif) */
   background-repeat: no-repeat;
   display: flex;
   align-items: flex-end;            /* Le contenu (titre) se cale en bas */
   overflow: hidden;
-  /* Ombre portée sous le hero — détache la bannière du fond du site.
-     RÉGLAGE : le 24px = étalement vertical de l'ombre (monte pour plus diffus) ;
-     le 0.55 = intensité (baisse pour plus subtil). */
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.55);
 }
 
-/* Cas 1 — vraie photo : l'URL est posée en inline par voyage.js (renderHero).
-   La couleur de fond sert de fallback le temps que la photo charge. */
+.voyage-hero__media {
+  position: absolute;
+  inset: 0;                /* Couvre tout le hero (top/right/bottom/left: 0) */
+  z-index: 0;              /* Derrière le scrim (::after) et le contenu */
+  background-size: cover;  /* L'image remplit le cadre */
+  background-repeat: no-repeat;
+  /* background-image + background-position : posés en inline par voyage.js. */
+
+  /* Masque de fondu vers le bas : l'image devient progressivement transparente
+     dans son dernier quart → le fond du site (#111111) transparaît, SANS j onction
+     visible, quelle que soit la couleur de fond. N'affecte QUE cette couche image
+     (le titre est sur une couche sœur non masquée).
+     ───────────────────────────────────────────────────────────────
+     RÉGLAGE : le "75%" = à partir d'où le fondu commence (baisse-le → fondu plus
+     long/haut ; monte-le → fondu plus court, concentré tout en bas).
+     -webkit- : obligatoire pour Safari (priorité 1). */
+-webkit-mask-image: linear-gradient(to bottom, #000 0%, transparent 100%);
+        mask-image: linear-gradient(to bottom, #000 0%, transparent 100%);
+}
+
+/* Cas 1 — vraie photo : l'image est posée sur la couche .voyage-hero__media
+   (inline par voyage.js). PAS de background-color ici : le hero doit rester
+   TRANSPARENT pour que le fondu de l'image (masque, étape 2) révèle le fond
+   réel du site (#111111) — et non un aplat intermédiaire qui recréerait une
+   jonction visible. C'est précisément ce qu'on cherche à éviter. */
 .voyage-hero--photo {
-  background-color: #0e0d0b;
+  /* (transparent — aucune règle nécessaire ; classe conservée pour la sémantique
+     et d'éventuels réglages futurs spécifiques au cas photo) */
 }
 
 /* Cas 2 — pas de photo : fond anthracite + motif topographique discret.
@@ -170,43 +190,26 @@ body.has-hero .breadcrumb-current {
   content: '';
   position: absolute;
   inset: 0;
-  
-/* DEUX dégradés empilés (le 1er listé est au-dessus) :
-     · du HAUT  → lisibilité du fil d'Ariane superposé (body.has-hero)
-     · du BAS   → lisibilité du titre & des badges
-     Les % de chaque dégradé s'adaptent AUTOMATIQUEMENT à la hauteur du hero.
+
+  /* UN seul dégradé, du HAUT → lisibilité du fil d'Ariane superposé (has-hero).
+     La bande du BAS (titre) a été retirée : le fondu de l'image (masque sur
+     .voyage-hero__media) gère désormais la transition vers le fond du site,
+     et la lisibilité du titre est assurée par sa propre text-shadow.
+     Une bande basse opaque ICI recouvrirait le fondu → on la supprime.
+     Les % s'adaptent AUTOMATIQUEMENT à la hauteur du hero.
      ───────────────────────────────────────────────────────────────
-     RÉGLAGE BANDE HAUT (fil d'Ariane) — mêmes paliers que la bande du bas :
-       · 0.62 en haut = assombrissement max sous le fil d'Ariane
-       · le "70%" = jusqu'où la bande descend (baisse pour la concentrer en haut)
-     RÉGLAGE BANDE BAS (titre) :
-       · 0.62 en bas = assombrissement max ; le "70%" = étendue vers le haut */
+     RÉGLAGE : rgba(...,0.75) en haut = assombrissement max sous le fil d'Ariane ;
+     le "53%" = jusqu'où la bande descend (baisse-le pour la concentrer en haut). */
   background:
     linear-gradient(
       to bottom,
-      rgba(0, 0, 0, 0.75) 0%, /* 0.75 : intensidé du début du dégradé */
-      rgba(0, 0, 0, 0.30) 26%,
-      rgba(0, 0, 0, 0.10) 41%,
-      rgba(0, 0, 0, 0)    53%
-    ),
-    linear-gradient(
-      to top,
-      rgba(0, 0, 0, 1) 0%, /* 0.75 : intensidé du début du dégradé */
+      rgba(0, 0, 0, 0.75) 0%,
       rgba(0, 0, 0, 0.30) 26%,
       rgba(0, 0, 0, 0.10) 41%,
       rgba(0, 0, 0, 0)    53%
     );
-  pointer-events: none;            /* Les dégradés ne bloquent pas les clics */
-}
 
-/* Fond "sans photo" — motif topographique sur anthracite.
-   Ajouté par voyage.js (classe --motif) quand le voyage n'a pas de vraie photo.
-   Le SVG ne contient que les lignes (fond transparent) → la couleur de fond
-   est définie ici. size/position/repeat sont hérités de .voyage-hero.
-   La photo, elle, est posée en background-image inline par le JS (pas de classe). */
-.voyage-hero--motif {
-  background-color: #141312;
-  background-image: url('../images/motifs/topographie.svg');
+  pointer-events: none;            /* Le dégradé ne bloque pas les clics */
 }
 
 /* Contenu du hero (titre + badges) — au-dessus du dégradé (z-index),

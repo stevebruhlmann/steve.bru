@@ -26,9 +26,17 @@ async function loadNavbar() {
     const path     = window.location.pathname;
     const filename = path.split('/').pop().replace('.html', '') || 'index';
 
-    /* Ajoute nav-link--active sur le bon lien */
+    /* Section de navbar à mettre en surbrillance.
+       Priorité au `data-section` du <body> : une sous-page sans lien propre
+       (ex: voyage.html → "voyages") déclare ainsi sa section parente, et le
+       lien parent reste actif. Absent → on prend le nom de fichier (cas normal :
+       une page avec son propre lien navbar). L'info vit dans la page elle-même,
+       pas dans une table centrale ici → rien à maintenir lors d'un ajout de page. */
+    const sectionActive = document.body.dataset.section || filename;
+
+    /* Ajoute nav-link--active sur le lien de la section courante */
     container.querySelectorAll('.nav-link[data-page]').forEach(link => {
-      if (link.dataset.page === filename) {
+      if (link.dataset.page === sectionActive) {
         link.classList.add('nav-link--active');
       }
     });

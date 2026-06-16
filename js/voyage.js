@@ -173,9 +173,9 @@ function renderHero(v) {
     `<span class="voyage-badge-type">${t}</span>`
   ).join('');
 
-  /* Classe + style selon la présence d'une photo :
-     - photo → fond image inline (l'URL est une donnée, donc en JS)
-     - sinon → classe motif (le fond topographie est géré 100% en CSS) */
+  /* Classe selon la présence d'une photo :
+     - photo → la couche image (.voyage-hero__media) reçoit le fond inline
+     - sinon → classe motif (le fond topographie est géré 100% en CSS sur le hero) */
   const classeFond = coverUrl ? 'voyage-hero--photo' : 'voyage-hero--motif';
 
   /* Cadrage vertical de la photo de couverture.
@@ -183,13 +183,20 @@ function renderHero(v) {
      la photo, 50% = milieu (défaut), 100% = bas. L'horizontal reste centré.
      Réglable photo par photo dans voyages_data.js ; absent → '50%' (mi-hauteur).
      Format final injecté : "center <Y>" (horizontal centré, vertical piloté). */
-  const coverPos  = v.cover_pos || '50%';
-  const styleFond = coverUrl
-    ? `style="background-image: url('${coverUrl}'); background-position: center ${coverPos};"`
+  const coverPos = v.cover_pos || '50%';
+
+  /* Couche image dédiée (.voyage-hero__media) :
+     - elle SEULE porte l'image + le masque de fondu (étape 2) → le titre,
+       placé sur une couche sœur, n'est jamais affecté par le masque.
+     - le JS pose ici l'image en inline (l'URL est une donnée) ; pas de photo
+       → on ne génère pas la couche, le motif CSS du hero prend le relais. */
+  const mediaHTML = coverUrl
+    ? `<div class="voyage-hero__media" style="background-image: url('${coverUrl}'); background-position: center ${coverPos};"></div>`
     : '';
 
   document.getElementById('voyage-hero').innerHTML = `
-    <div class="voyage-hero ${classeFond}" ${styleFond}>
+    <div class="voyage-hero ${classeFond}">
+      ${mediaHTML}
       <div class="voyage-hero__content">
         <div class="voyage-hero__titlerow">
           <h1 class="voyage-hero__title">${v.country.replace(/;/g, ' / ')}</h1>
