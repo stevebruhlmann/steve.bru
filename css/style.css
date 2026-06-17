@@ -6,23 +6,34 @@
 
 /* ── VARIABLES ── */
 :root {
-  --bg:                     #111111;  /* Gris pur — couleur de fond définitive (tranchée P10) */
-  --border:                 rgba(255,255,255,0.12);
-  --accent:                 #4a9a8e;
-  --gold:                   #c9a96e;
-  --text:                   #f5f4f0;
-  --muted:                  rgba(245,244,240,0.4);
-  --font-display:           'Cormorant Garamond', Georgia, serif;
-  --font-body:              'Inter', system-ui, sans-serif;
-  --nav-h:                  64px;
-  --logo-nudge:             -5px;  /* Compensation du centre optique de Cormorant Garamond
+  --bg:                      #111111;  /* Gris pur — couleur de fond définitive (tranchée P10) */
+  --border:                  rgba(255,255,255,0.12);
+  --accent:                  #4a9a8e;
+  --gold:                    #c9a96e;
+  --text:                    #f5f4f0;
+  --muted:                   rgba(245,244,240,0.4);
+  --font-display:            'Cormorant Garamond', Georgia, serif;
+  --font-body:               'Inter', system-ui, sans-serif;
+  --nav-h:                   64px;
+  --logo-nudge:              -5px;  /* Compensation du centre optique de Cormorant Garamond
                                       à 1.8rem — recentre le logo dans la navbar. Source unique
                                       utilisée partout où le logo est calé (in-nav, mobile, pages
                                       secondaires). Si tu changes de police/taille → re-mesurer. */
-  --transition:             0.55s cubic-bezier(0.22, 1, 0.36, 1);
-  --content-width:          1100px;  /* Largeur max du contenu sur toutes les pages */
-  --content-padding:        40px;   /* Marge gauche/droite desktop/tablette — modifier ici = change partout */
-  --content-padding-mobile: 20px;   /* Marge gauche/droite mobile  — modifier ici = change partout */
+  --transition:              0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  /* Ombres portées de texte sur photo (hero, navbar translucide sur photo).
+     Double couche : une nette/serrée (contours) + une large/diffuse (décolle
+     du fond clair). UN SEUL endroit à régler → se propage partout.
+     ───────────────────────────────────────────────────────────────
+     --hero-text-shadow  : textes FINS (fil d'Ariane, badges, liens navbar)
+     --hero-title-shadow : GROS titres (titre du hero)
+     RÉGLAGE : monter les alphas si les photos sont très claires. */
+  --hero-text-shadow:        0 1px 2px rgba(0, 0, 0, 0.7),
+                             0 0 8px  rgba(0, 0, 0, 0.45);
+  --hero-title-shadow:       0 1px 3px rgba(0, 0, 0, 0.6),
+                             0 0 18px rgba(0, 0, 0, 0.45);
+  --content-width:           1100px;  /* Largeur max du contenu sur toutes les pages */
+  --content-padding:         40px;   /* Marge gauche/droite desktop/tablette — modifier ici = change partout */
+  --content-padding-mobile:  20px;   /* Marge gauche/droite mobile  — modifier ici = change partout */
 }
 
 /* ── RESET ── */
