@@ -709,7 +709,7 @@ const VOYAGES_DATA = [
     stops:              ["Kilimandjaro", "Arusha", "Parc du Tarangire", "Lac Manyara", "Ngorongoro", "Serengeti", "Arusha", "Kilimandjaro", "Zanzibar City"],
     photos:             12,
     cover:              6,
-    cover_pos:          "60%",
+    cover_pos:          "75%",
     intro:              "Safari dans le Serengeti et sur le cratère du Ngorongoro, puis Zanzibar pour souffler.",
     comments:           null,
   },
