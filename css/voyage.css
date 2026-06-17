@@ -242,15 +242,15 @@ body.has-hero .breadcrumb-current {
   flex-wrap: wrap;
 }
 
-/* Fond foncé semi-opaque DERRIÈRE les badges — uniquement dans le hero.
-   Cible précise (.voyage-hero__badges …) → les badges des autres contextes
-   ne sont pas affectés. Améliore le contraste sur photo claire.
-   ───────────────────────────────────────────────────────────────
-   RÉGLAGE : le dernier nombre de rgba (0.45) = opacité du fond noir.
-   Monte-le vers 0.65 pour un fond plus foncé, baisse-le pour plus discret. */
+/* Badges dans le hero — lisibilité par OMBRE de texte (plus de fond noir).
+   Le fond noir semi-opaque faisait tache sur la photo (deux rectangles visibles) ;
+   on le retire et on s'appuie sur la même ombre que le reste (variable centrale),
+   cohérent avec le titre et le fil d'Ariane. Cible précise → badges hors hero
+   non affectés. */
 .voyage-hero__badges .voyage-badge-type,
 .voyage-hero__badges .voyage-badge-futur {
-  background: rgba(0, 0, 0, 0.40);
+  background: none;                      /* Fond noir retiré (P13) */
+  text-shadow: var(--hero-text-shadow);  /* Ombre cohérente (style.css :root) */
 }
 
 /* Responsive mobile — hero plus court pour ne pas noyer le contenu */
