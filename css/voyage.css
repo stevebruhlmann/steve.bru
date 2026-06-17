@@ -204,9 +204,9 @@ body.has-hero .breadcrumb-current {
     linear-gradient(
       to bottom,
       rgba(0, 0, 0, 0.75) 0%,
-      rgba(0, 0, 0, 0.30) 10%,
-      rgba(0, 0, 0, 0.10) 15%,
-      rgba(0, 0, 0, 0)    20%
+      /*rgba(0, 0, 0, 0.30) 10%,*/
+      /*rgba(0, 0, 0, 0.10) 15%,*/
+      rgba(0, 0, 0, 0)    40%
     );
 
   pointer-events: none;            /* Le dégradé ne bloque pas les clics */
