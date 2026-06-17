@@ -41,8 +41,18 @@ body.has-hero .breadcrumb {
   padding-bottom: 0;           /* Plus d'espace bas nécessaire en superposition */
 }
 
-/* Liens du fil d'Ariane → blanc, lisibles sur la bande dégradée du hero.
-   Cible limitée à body.has-hero → les autres pages gardent le style muted. */
+/* Liens du fil d'Ariane → blanc, lisibles directement sur la photo du hero.
+   La lisibilité est assurée par une text-shadow (le voile ::after a été retiré) :
+   l'ombre ne touche QUE le texte, sans assombrir la photo. Cible limitée à
+   body.has-hero → les autres pages gardent le style muted, sans ombre. */
+body.has-hero .breadcrumb-home,
+body.has-hero .breadcrumb-sep,
+body.has-hero .breadcrumb-current {
+  /* RÉGLAGE : 1er rgba = halo proche (netteté), 2e = halo large (décolle du fond).
+     Monte les alphas (0.9 / 0.6) si la photo sous le texte est très claire. */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7),
+               0 0 8px rgba(0, 0, 0, 0.45);
+}
 body.has-hero .breadcrumb-home,
 body.has-hero .breadcrumb-sep {
   color: rgba(255, 255, 255, 0.75);
