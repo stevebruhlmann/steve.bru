@@ -48,10 +48,7 @@ body.has-hero .breadcrumb {
 body.has-hero .breadcrumb-home,
 body.has-hero .breadcrumb-sep,
 body.has-hero .breadcrumb-current {
-  /* RÉGLAGE : 1er rgba = halo proche (netteté), 2e = halo large (décolle du fond).
-     Monte les alphas (0.9 / 0.6) si la photo sous le texte est très claire. */
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7),
-               0 0 8px rgba(0, 0, 0, 0.45);
+  text-shadow: var(--hero-text-shadow); /* Variable centrale (:root, style.css) */
 }
 body.has-hero .breadcrumb-home,
 body.has-hero .breadcrumb-sep {
