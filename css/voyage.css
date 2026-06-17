@@ -196,32 +196,13 @@ body.has-hero .breadcrumb-current {
   background-size: cover;
 }
 
-.voyage-hero::after {
-  content: '';
-  display: none;   /* TEST P13 — voile du haut désactivé. Retirer cette ligne pour le réactiver. */
-  position: absolute;
-  inset: 0;
 
-  /* UN seul dégradé, du HAUT → lisibilité du fil d'Ariane superposé (has-hero).
-     La bande du BAS (titre) a été retirée : le fondu de l'image (masque sur
-     .voyage-hero__media) gère désormais la transition vers le fond du site,
-     et la lisibilité du titre est assurée par sa propre text-shadow.
-     Une bande basse opaque ICI recouvrirait le fondu → on la supprime.
-     Les % s'adaptent AUTOMATIQUEMENT à la hauteur du hero.
-     ───────────────────────────────────────────────────────────────
-     RÉGLAGE : rgba(...,0.75) en haut = assombrissement max sous le fil d'Ariane ;
-     le "53%" = jusqu'où la bande descend (baisse-le pour la concentrer en haut). */
-  background:
-    linear-gradient(
-      to bottom,
-      rgba(0, 0, 0, 0.75)  0%,
-      rgba(0, 0, 0, 0.15) 17%,
-      rgba(0, 0, 0, 0.04) 23%,
-      rgba(0, 0, 0, 0)    27%
-    );
+/* Pas de ::after sur le hero (P13) : le voile sombre du haut a été retiré.
+   - lisibilité du fil d'Ariane → text-shadow sur .breadcrumb (section 0)
+   - lisibilité du titre        → text-shadow sur .voyage-hero__title
+   - fondu de l'image vers le bas → mask-image sur .voyage-hero__media
+   Plus aucun dégradé posé par-dessus la photo : tout passe par le texte ou le masque. */
 
-  pointer-events: none;            /* Le dégradé ne bloque pas les clics */
-}
 
 /* Contenu du hero (titre + badges) — au-dessus du dégradé (z-index),
    aligné sur la grille de contenu standard du site. */
@@ -254,7 +235,12 @@ body.has-hero .breadcrumb-current {
   color: #ffffff;
   line-height: 1;
   margin: 0;               /* Marge gérée par le conteneur .titlerow */
-  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.5); /* Renfort de lisibilité */
+  /* Lisibilité du titre directement sur la photo (plus de voile ::after).
+     Double ombre : une nette/serrée pour les contours, une large/diffuse pour
+     décoller du fond clair. Le titre est gros → halos un peu plus larges que
+     le fil d'Ariane. RÉGLAGE : monte les alphas si la photo est très claire. */
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6),
+               0 0 18px rgba(0, 0, 0, 0.45);
 }
 
 /* Rangée de badges (type + futur) dans le hero — calée à côté du titre */
