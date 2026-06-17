@@ -242,15 +242,15 @@ body.has-hero .breadcrumb-current {
   flex-wrap: wrap;
 }
 
-/* Badges dans le hero — lisibilité par OMBRE de texte (plus de fond noir).
-   Le fond noir semi-opaque faisait tache sur la photo (deux rectangles visibles) ;
-   on le retire et on s'appuie sur la même ombre que le reste (variable centrale),
-   cohérent avec le titre et le fil d'Ariane. Cible précise → badges hors hero
-   non affectés. */
+/* Badges dans le hero — style "pill" à fond blanc (P13).
+   Fond blanc opaque → lisibles sur n'importe quelle photo (clair ou sombre).
+   Petite box-shadow pour détacher la pastille du fond sans bord franc.
+   Pas de text-shadow ici : le texte est sur du blanc, pas sur la photo.
+   La couleur du texte et de la bordure est gérée plus bas (par type de badge). */
 .voyage-hero__badges .voyage-badge-type,
 .voyage-hero__badges .voyage-badge-futur {
-  background: none;                      /* Fond noir retiré (P13) */
-  text-shadow: var(--hero-text-shadow);  /* Ombre cohérente (style.css :root) */
+  background: #ffffff;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.35);
 }
 
 /* Responsive mobile — hero plus court pour ne pas noyer le contenu */
