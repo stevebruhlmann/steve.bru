@@ -188,6 +188,7 @@ body.has-hero .breadcrumb-current {
 
 .voyage-hero::after {
   content: '';
+  display: none;   /* TEST P13 — voile du haut désactivé. Retirer cette ligne pour le réactiver. */
   position: absolute;
   inset: 0;
 
