@@ -159,8 +159,8 @@ body.has-hero .breadcrumb-current {
      RÉGLAGE : le "75%" = à partir d'où le fondu commence (baisse-le → fondu plus
      long/haut ; monte-le → fondu plus court, concentré tout en bas).
      -webkit- : obligatoire pour Safari (priorité 1). */
--webkit-mask-image: linear-gradient(to bottom, #000 0%, transparent 100%);
-        mask-image: linear-gradient(to bottom, #000 0%, transparent 100%);
+-webkit-mask-image: linear-gradient(to bottom, #000 70%, transparent 100%);
+        mask-image: linear-gradient(to bottom, #000 70%, transparent 100%);
 }
 
 /* Cas 1 — vraie photo : l'image est posée sur la couche .voyage-hero__media
