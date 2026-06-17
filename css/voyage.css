@@ -235,12 +235,7 @@ body.has-hero .breadcrumb-current {
   color: #ffffff;
   line-height: 1;
   margin: 0;               /* Marge gérée par le conteneur .titlerow */
-  /* Lisibilité du titre directement sur la photo (plus de voile ::after).
-     Double ombre : une nette/serrée pour les contours, une large/diffuse pour
-     décoller du fond clair. Le titre est gros → halos un peu plus larges que
-     le fil d'Ariane. RÉGLAGE : monte les alphas si la photo est très claire. */
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6),
-               0 0 18px rgba(0, 0, 0, 0.45);
+  text-shadow: var(--hero-title-shadow); /* Variable centrale (:root, style.css) */
 }
 
 /* Rangée de badges (type + futur) dans le hero — calée à côté du titre */
