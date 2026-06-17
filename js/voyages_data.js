@@ -687,7 +687,7 @@ const VOYAGES_DATA = [
     stops:              ["Tokyo", "Hakone", "Asakawa", "Fujikawaguchiko", "Takayama", "Tajimi", "Nara", "Kyoto", "Narita"],
     photos:             0,
     cover:              1,
-    cover_pos:          "50%",
+    cover_pos:          "75%",
     intro:              "Le Japon au moment des cerisiers en fleur — hanami à Kyoto, Fuji sous la neige.",
     comments:           null,
   },
