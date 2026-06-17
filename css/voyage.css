@@ -131,7 +131,7 @@ body.has-hero .breadcrumb-current {
 .voyage-hero {
   position: relative;               /* Référence pour le dégradé (::after) et le contenu */
   width: 100%;
-  height: clamp(260px, 40vh, 410px); /* Fluide : 40vh borné entre 260px et 410px (~2/3 de la hauteur initiale) */
+  height: clamp(208px, 32vh, 328px); /* Fluide : 32vh borné entre 208px et 328px (hero −20% en P13) */
   margin-bottom: 36px;
   /* NB : la PHOTO n'est plus posée ici — elle vit sur la couche enfant
      .voyage-hero__media (voir plus bas). Les background-* ci-dessous ne servent
@@ -267,7 +267,7 @@ body.has-hero .breadcrumb-current {
 /* Responsive mobile — hero plus court pour ne pas noyer le contenu */
 @media (max-width: 680px) {
   .voyage-hero {
-    height: clamp(220px, 33vh, 310px); /* Hero mobile aux ~2/3 — assez court pour ne pas pousser le contenu trop bas */
+    height: clamp(176px, 26vh, 248px); /* Hero mobile −20% (P13) */
     margin-bottom: 28px;
   }
   .voyage-hero__content {
