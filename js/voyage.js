@@ -173,26 +173,25 @@ function renderHero(v) {
     `<span class="voyage-badge-type">${t}</span>`
   ).join('');
 
-  /* Classe selon la présence d'une photo :
-     - photo → la couche image (.voyage-hero__media) reçoit le fond inline
-     - sinon → classe motif (le fond topographie est géré 100% en CSS sur le hero) */
+  /* Classe selon la présence d'une photo (sert aux réglages spécifiques par cas).
+     Dans les DEUX cas, le fond (photo OU motif) vit sur la couche .voyage-hero__media
+     → il hérite du même masque de fondu vers le bas. */
   const classeFond = coverUrl ? 'voyage-hero--photo' : 'voyage-hero--motif';
 
-  /* Cadrage vertical de la photo de couverture.
-     `cover_pos` (donnée par voyage) = position VERTICALE en % : 0% = haut de
-     la photo, 50% = milieu (défaut), 100% = bas. L'horizontal reste centré.
-     Réglable photo par photo dans voyages_data.js ; absent → '50%' (mi-hauteur).
-     Format final injecté : "center <Y>" (horizontal centré, vertical piloté). */
+  /* Source du fond de la couche __media :
+     - photo → l'image de couverture, cadrée verticalement par cover_pos
+     - pas de photo → le motif topographique (taille "cover", centré)
+     `cover_pos` (photo only) = position VERTICALE en % : 0% haut, 50% milieu (défaut),
+     100% bas ; l'horizontal reste centré. Absent → '50%'. */
   const coverPos = v.cover_pos || '50%';
+  const mediaStyle = coverUrl
+    ? `background-image: url('${coverUrl}'); background-position: center ${coverPos};`
+    : `background-image: url('images/motifs/topographie.svg'); background-position: center;`;
 
-  /* Couche image dédiée (.voyage-hero__media) :
-     - elle SEULE porte l'image + le masque de fondu (étape 2) → le titre,
-       placé sur une couche sœur, n'est jamais affecté par le masque.
-     - le JS pose ici l'image en inline (l'URL est une donnée) ; pas de photo
-       → on ne génère pas la couche, le motif CSS du hero prend le relais. */
-  const mediaHTML = coverUrl
-    ? `<div class="voyage-hero__media" style="background-image: url('${coverUrl}'); background-position: center ${coverPos};"></div>`
-    : '';
+  /* Couche fond dédiée (.voyage-hero__media) — photo OU motif :
+     elle SEULE porte le fond + le masque de fondu → le titre (couche sœur)
+     n'est jamais masqué. Toujours générée, quel que soit le cas. */
+  const mediaHTML = `<div class="voyage-hero__media" style="${mediaStyle}"></div>`;
 
   document.getElementById('voyage-hero').innerHTML = `
     <div class="voyage-hero ${classeFond}">
