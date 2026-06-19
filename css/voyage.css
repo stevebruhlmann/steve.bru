@@ -251,21 +251,21 @@ body.has-hero .breadcrumb-current {
   flex-wrap: wrap;
 }
 
-/* Badges dans le hero — variante E : pill à COULEUR PLEINE, texte blanc (P13).
-   Fond opaque coloré → lisible sur n'importe quelle photo. Texte blanc, sans
-   bordure (le fond plein la remplace), sans text-shadow (texte sur fond uni).
-   box-shadow légère pour détacher la pastille de la photo.
+/* Badges dans le hero — pastille teintée SEMI-transparente (P14, évol. variante E P13).
+   Fond translucide (alpha 0.55) → la photo transparaît derrière le badge, qui se fond
+   dans le hero au lieu d'un aplat opaque. Texte blanc, sans bordure, box-shadow légère
+   pour détacher la pastille. (Option SANS flou retenue : photo nette derrière.)
    Les COULEURS de fond par type sont définies juste en dessous. */
 .voyage-hero__badges .voyage-badge-type,
 .voyage-hero__badges .voyage-badge-futur {
-  color: #ffffff;
-  border-color: transparent;            /* Plus de bordure : le fond plein suffit */
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.35);
+color: #ffffff;
+border-color: transparent;            /* Pas de bordure : le fond teinté suffit */
+box-shadow: 0 1px 6px rgba(0, 0, 0, 0.35);
 }
-
-/* Couleur de fond par type — pétrole pour les types de voyage, doré pour "Prévu" */
-.voyage-hero__badges .voyage-badge-type  { background: var(--accent); }
-.voyage-hero__badges .voyage-badge-futur { background: var(--gold);   }
+/* Couleur de fond par type — pétrole / doré, en version SEMI-transparente (0.55)
+   pour laisser transparaître la photo derrière la pastille. */
+.voyage-hero__badges .voyage-badge-type  { background: rgba(74, 154, 142, 0.55); }  /* --accent #4a9a8e à 55% */
+.voyage-hero__badges .voyage-badge-futur { background: rgba(201, 169, 110, 0.55); } /* --gold   #c9a96e à 55% */
 
 /* Responsive mobile — hero plus court pour ne pas noyer le contenu */
 @media (max-width: 680px) {
