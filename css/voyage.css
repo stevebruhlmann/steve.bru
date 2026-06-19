@@ -159,15 +159,28 @@ body.has-hero .breadcrumb-current {
   /* background-image + background-position : posés en inline par voyage.js. */
 
   /* Masque de fondu vers le bas : l'image devient progressivement transparente
-     dans son dernier quart → le fond du site (#111111) transparaît, SANS j onction
-     visible, quelle que soit la couleur de fond. N'affecte QUE cette couche image
-     (le titre est sur une couche sœur non masquée).
+     → révèle le fond réel du site, quelle que soit sa couleur. N'affecte QUE
+     cette couche image (le titre est sur une couche sœur non masquée).
      ───────────────────────────────────────────────────────────────
-     RÉGLAGE : le "75%" = à partir d'où le fondu commence (baisse-le → fondu plus
-     long/haut ; monte-le → fondu plus court, concentré tout en bas).
+     COURBE (P14) : pleine jusqu'à 40%, puis fondu progressif en 4 paliers.
+     - 1er % (40%) = où le fondu COMMENCE (plus bas = fondu plus long/haut).
+     - les paliers intermédiaires adoucissent la pente (évite la cassure nette).
+     - transparent atteint à 95% (PAS 100%) : CRUCIAL — le hero a overflow:hidden,
+       donc le fondu doit être TERMINÉ avant le bord, sinon l'image est coupée
+       net (bord franc) au lieu de se dissoudre. Garder la fin < 100%.
      -webkit- : obligatoire pour Safari (priorité 1). */
--webkit-mask-image: linear-gradient(to bottom, #000 85%, transparent 100%);
-        mask-image: linear-gradient(to bottom, #000 85%, transparent 100%);
+-webkit-mask-image: linear-gradient(to bottom,
+                      #000 40%,
+                      rgba(0,0,0,0.85) 58%,
+                      rgba(0,0,0,0.5) 73%,
+                      rgba(0,0,0,0.15) 85%,
+                      transparent 95%);
+        mask-image: linear-gradient(to bottom,
+                      #000 40%,
+                      rgba(0,0,0,0.85) 58%,
+                      rgba(0,0,0,0.5) 73%,
+                      rgba(0,0,0,0.15) 85%,
+                      transparent 95%);
 }
 
 /* Cas 1 — vraie photo : l'image est posée sur la couche .voyage-hero__media
