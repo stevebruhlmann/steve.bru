@@ -156,6 +156,13 @@ body.has-hero .breadcrumb-current {
   z-index: 0;              /* Derrière le scrim (::after) et le contenu */
   background-size: cover;  /* L'image remplit le cadre */
   background-repeat: no-repeat;
+
+/* Traitement de la photo du hero (P14) — la calme pour qu'elle "introduise"
+     sans dominer (esprit écrin), et fait mieux ressortir le titre blanc.
+     Les 3 fonctions se chaînent dans UN seul filter. Réglables ici (< 1 chacune) :
+     brightness = luminosité · contrast = punch · saturate = intensité couleurs. */
+  filter: brightness(0.85) contrast(0.85) saturate(0.85);
+  
   /* background-image + background-position : posés en inline par voyage.js. */
 
   /* Masque de fondu vers le bas : l'image devient progressivement transparente
