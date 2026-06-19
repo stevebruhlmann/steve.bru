@@ -32,6 +32,7 @@
   white-space: nowrap;
   animation: none;
   z-index: 1;
+  text-shadow: var(--logo-shadow);   /* P14 — détache le logo du fond sur pages secondaires (navbar sur photo de hero) */
 }
 
   /* ── Lien de navigation actif — page courante ── */
