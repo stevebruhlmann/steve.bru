@@ -20,36 +20,44 @@
                                       utilisée partout où le logo est calé (in-nav, mobile, pages
                                       secondaires). Si tu changes de police/taille → re-mesurer. */
   --transition:              0.55s cubic-bezier(0.22, 1, 0.36, 1);
-  /* Ombres portées de texte sur photo (hero, navbar translucide sur photo).
-     Double couche : une nette/serrée (contours) + une large/diffuse (décolle
-     du fond clair). UN SEUL endroit à régler → se propage partout.
-     ───────────────────────────────────────────────────────────────
-     --hero-text-shadow  : textes FINS (fil d'Ariane, badges, liens navbar)
-     --hero-title-shadow : GROS titres (titre du hero)
-     RÉGLAGE : monter les alphas si les photos sont très claires. */
-   
-  /* 3 couches qui se relaient : contour net (fort) → halo moyen → halo large (doux).
-     Protection renforcée SANS tache opaque. Les 2 variables suivent le même schéma
-     d'alphas (0.9 / 0.6 / 0.4), seuls les flous changent selon la taille du texte. */
-  
-     /* Ombres en `em` → proportionnelles à la taille du texte qui les porte.
-     (1em = font-size de l'élément → l'ombre grandit/rétrécit automatiquement.)
-     3 couches aux alphas décroissants (contour → halo moyen → halo large).
-     --hero-text-shadow  : textes FINS sur photo (fil d'Ariane) — ombre un peu
-                           plus marquée en proportion (les petits caractères
-                           en ont besoin pour rester lisibles).
-     --hero-title-shadow : GROS titre sur photo.
-     --logo-shadow       : logo steve.bru sur fond UNI — 1 couche douce, esthétique
-                           (pas de besoin de lisibilité), proportionnelle aussi. */
---hero-text-shadow:   0   0       0.4em   rgba(255, 0, 0, 1),
-                      0   0       0.8em   rgba(255, 0, 0, 1),
-                      0   0       1.5em   rgba(255, 0, 0, 1);   /* TEST P14 */
---hero-title-shadow:  0   0       0.4em   rgba(0, 0, 255, 10),
-                      0   0       0.8em   rgba(0, 0, 255, 10),
-                      0   0       1.5em   rgba(0, 0, 255, 10);   /* TEST P14 */
---logo-shadow:        0   0       0.4em   rgba(0, 255, 0, 1),
-                      0   0         1em   rgba(0, 255, 0, 1),
-                      0   0       1.8em   rgba(0, 255, 0, 1);   /* TEST P14 — glow 3 couches autour du logo */
+
+/* ── OMBRES DE TEXTE SUR PHOTO ──────────────────────────────────────
+     text-shadow appliqué aux textes posés sur une photo (hero) ou sur la
+     navbar translucide quand elle passe au-dessus d'une photo. Permet de
+     décoller le texte d'un fond clair/chargé. UN SEUL endroit à régler.
+
+     Principe commun : 3 couches qui se relaient — contour net → halo moyen
+     → halo large — avec des alphas DÉCROISSANTS (rendu dense sans tache
+     opaque). Rayons en `em` → proportionnels à la taille du texte porteur
+     (l'ombre grandit/rétrécit automatiquement avec le font-size).
+
+     4 variables, une par rôle (découplées pour un réglage indépendant) :
+       --hero-text-shadow  : textes fins du hero (fil d'Ariane, badges)
+       --hero-title-shadow : gros titre du hero
+       --logo-shadow       : logo steve.bru
+       --nav-link-shadow   : liens de la navbar
+     RÉGLAGE : monter les alphas / élargir les flous si les photos sont très claires. */
+
+  /* Halo noir prononcé mais serré (peu étalé) — fil d'Ariane + badges. */
+  --hero-text-shadow:  0 0 0.10em rgba(0, 0, 0, 1),
+                       0 0 0.20em rgba(0, 0, 0, 0.9),
+                       0 0 0.35em rgba(0, 0, 0, 0.7);
+
+  /* Halo noir prononcé mais serré — gros titre du hero (même formule). */
+  --hero-title-shadow: 0 0 0.10em rgba(0, 0, 0, 1),
+                       0 0 0.20em rgba(0, 0, 0, 0.9),
+                       0 0 0.35em rgba(0, 0, 0, 0.7);
+
+  /* Halo bleu pétrole (--accent #4a9a8e) prononcé et TRÈS étalé — logo.
+     rgb() en dur car rgba() ne sait pas décomposer une variable hex. */
+  --logo-shadow:       0 0 0.4em  rgba(74, 154, 142, 1),
+                       0 0 1.1em  rgba(74, 154, 142, 0.8),
+                       0 0 2.2em  rgba(74, 154, 142, 0.6);
+
+  /* Halo noir serré — liens navbar (découplé du hero pour réglage autonome). */
+  --nav-link-shadow:   0 0 0.10em rgba(0, 0, 0, 1),
+                       0 0 0.20em rgba(0, 0, 0, 0.9),
+                       0 0 0.35em rgba(0, 0, 0, 0.7);
   
   --content-width:           1100px;  /* Largeur max du contenu sur toutes les pages */
   --content-padding:         40px;   /* Marge gauche/droite desktop/tablette — modifier ici = change partout */
@@ -151,6 +159,7 @@ a {
   font-size: clamp(4rem, 12vw, 8rem);
   letter-spacing: 0.04em;
   color: var(--text);
+  text-shadow: var(--logo-shadow);   /* P14 — halo présent dès l'état initial (gros logo centré), avant rangement. Hérité tel quel par .in-nav (cascade). */
   cursor: default;
   user-select: none;
   white-space: nowrap;
@@ -184,7 +193,7 @@ a {
      ci-dessus sans le remplacer. */
   translate: 0 var(--logo-nudge);
   cursor: pointer;
-  text-shadow: var(--logo-shadow);   /* P14 — détache le logo du fond (navbar sur photo de hero). Hérité tel quel en mobile, donc pas dupliqué dans le bloc max-width:680px */
+  /* text-shadow hérité du bloc #site-logo principal (cascade) — pas redéclaré ici (DRY). P14 */
   }
 
 /* Placeholder invisible — même taille que le logo in-nav,
@@ -302,7 +311,7 @@ a {
   text-transform: uppercase;
   color: var(--muted);
   transition: color 0.2s;
-  text-shadow: var(--hero-text-shadow);   /* P14 — détache les liens du fond quand la navbar passe sur une photo de hero */
+  text-shadow: var(--nav-link-shadow);   /* P14 — variable dédiée aux liens navbar (découplée du hero) */
 }
 
 /* Lien actif : hover, ou page en cours (défini par JS) */
@@ -648,6 +657,8 @@ a {
     translate: 0 var(--logo-nudge);
   }
 
+  /* Mobile — le gros logo central est plus petit que sur desktop.
+     text-shadow hérité du bloc #site-logo principal (cascade), pas redéclaré (DRY). P14 */
   #site-logo {
     font-size: clamp(2.8rem, 15vw, 4.5rem);
   }
