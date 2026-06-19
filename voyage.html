@@ -66,7 +66,11 @@
     </div>
   </div>
 
-<!-- ══════════════════════════════════════════════════════
+<!-- ── FOOTER ── -->
+  <!-- Footer centralisé — injecté par footer.js via fetch() (P14) -->
+  <div id="footer-container"></div>
+
+  <!-- ══════════════════════════════════════════════════════
        SCRIPTS — ordre important :
          1. navbar.js        → navbar + fil d'Ariane
          2. imagesloaded.js  → attend le chargement des images
@@ -74,15 +78,16 @@
          4. voyages_data.js  → VOYAGES_DATA (source unique)
          5. voyages.js       → carte D3 + grille
          6. voyage.js        → rendu + lightbox
+         7. footer.js        → footer commun
   ══════════════════════════════════════════════════════ -->
   <script src="js/navbar.js"></script>
-<!-- Librairies masonry — hébergées localement -->
-<script src="js/vendor/imagesloaded.pkgd.min.js"></script>
-<script src="js/vendor/masonry.pkgd.min.js"></script>
-<!-- voyages_data.js doit être chargé AVANT voyages.js et voyage.js -->
-<script src="js/voyages_data.js"></script>
-<script src="js/voyages.js"></script>
-<script src="js/voyage.js"></script>
-
+  <!-- Librairies masonry — hébergées localement -->
+  <script src="js/vendor/imagesloaded.pkgd.min.js"></script>
+  <script src="js/vendor/masonry.pkgd.min.js"></script>
+  <!-- voyages_data.js doit être chargé AVANT voyages.js et voyage.js -->
+  <script src="js/voyages_data.js"></script>
+  <script src="js/voyages.js"></script>
+  <script src="js/voyage.js"></script>
+  <script src="js/footer.js"></script>
 </body>
 </html>

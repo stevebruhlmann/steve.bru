@@ -101,12 +101,10 @@
 
 
   <!-- ── FOOTER ── -->
-  <footer id="site-footer">
-    <span>© 2026 steve.bru</span>
-  </footer>
+  <!-- Footer centralisé — injecté par footer.js via fetch() (P14) -->
+  <div id="footer-container"></div>
 
-
-  <!-- ══════════════════════════════════════════════
+<!-- ══════════════════════════════════════════════
        SCRIPTS
        Ordre important :
        1. D3.js      → librairie carte
@@ -119,6 +117,7 @@
   <!-- voyages_data.js doit être chargé AVANT voyages.js -->
   <script src="js/voyages_data.js"></script>
   <script src="js/voyages.js"></script>
+  <script src="js/footer.js"></script>
 
 </body>
 </html>
