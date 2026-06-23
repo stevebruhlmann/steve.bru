@@ -610,8 +610,9 @@ a {
   text-transform: uppercase;
   color: rgba(245,244,240,0.15);
   display: flex;
-  flex-direction: column;
+  flex-direction: column;               /* Empilement vertical copyright + version */
   align-items: center;
+  gap: 4px;                             /* Interligne entre copyright et version */
 }
 
 /* Ligne séparatrice — suit automatiquement la largeur du footer */
@@ -621,7 +622,7 @@ a {
   width: 100%;
   height: 1px;
   background: var(--border);
-  margin-bottom: 0;
+  margin-bottom: 16px;                  /* Respiration entre la ligne et le copyright */
 }
 
 
