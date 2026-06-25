@@ -71,6 +71,7 @@ document.addEventListener('navbar-ready', () => {
     heroScreen.classList.add('done');
     scrollHint.classList.add('hidden');
     mainContent.classList.add('revealed');
+    initScrollReveal(); /* Scroll reveal — sessions déjà vues */
     checkNavOverflow();
     document.documentElement.style.overflow = 'auto';
   }
@@ -96,6 +97,7 @@ document.addEventListener('navbar-ready', () => {
       hamburger.classList.add('visible');
       logo.style.cursor = 'pointer';
       mainContent.classList.add('revealed');
+      initScrollReveal(); /* Scroll reveal — première visite */
       checkNavOverflow();
     }, 550);
 
