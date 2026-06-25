@@ -190,7 +190,7 @@ body.has-hero .breadcrumb-current {
                       transparent 95%);
 }
 
-/* Cas 1 — vraie photo : l'image est posée sur la couche .voyage-hero__media
+/* Vraie photo : l'image est posée sur la couche .voyage-hero__media
    (inline par voyage.js). PAS de background-color ici : le hero doit rester
    TRANSPARENT pour que le fondu de l'image (masque, étape 2) révèle le fond
    réel du site (#111111) — et non un aplat intermédiaire qui recréerait une
@@ -199,16 +199,6 @@ body.has-hero .breadcrumb-current {
   /* (transparent — aucune règle nécessaire ; classe conservée pour la sémantique
      et d'éventuels réglages futurs spécifiques au cas photo) */
 }
-
-/* Cas 2 — pas de photo : le motif topographique est désormais posé sur la couche
-   .voyage-hero__media (inline par voyage.js), exactement comme une photo → il
-   hérite du MÊME masque de fondu vers le bas (révèle le fond du site #111111).
-   Plus de fond ni d'image ici : la classe reste pour d'éventuels réglages
-   spécifiques au cas "sans photo". */
-.voyage-hero--motif {
-  /* (transparent — fond géré par .voyage-hero__media) */
-}
-
 
 /* Pas de ::after sur le hero (P13) : le voile sombre du haut a été retiré.
    - lisibilité du fil d'Ariane → text-shadow sur .breadcrumb (section 0)
