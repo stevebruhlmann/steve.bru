@@ -250,11 +250,13 @@ async function initMap() {
   const zoom = d3.zoom()
     .scaleExtent([1, 8])
     .translateExtent([[0, 0], [W, H]])
-    .filter(event => {
-      /* Désactive le zoom à la molette et au pinch trackpad —
-         évite de bloquer le scroll de la page quand le curseur est sur la carte.
-         Le zoom reste accessible via les boutons +/− et le clic sur les points. */
+      .filter(event => {
+      /* Molette/trackpad désactivés (bloquerait le scroll de la page).
+         Sur mobile : 2 doigts requis pour déplacer/zoomer la carte —
+         1 doigt seul fait défiler la page normalement (comme Google Maps).
+         Sur desktop : drag souris autorisé. */
       if (event.type === 'wheel') return false;
+      if (event.touches) return event.touches.length >= 2;
       return true;
     })
     .on('zoom', (event) => {
