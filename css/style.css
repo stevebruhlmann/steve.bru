@@ -60,8 +60,8 @@
                        0 0 0.35em rgba(0, 0, 0, 0.7);
   
   --content-width:           1100px;  /* Largeur max du contenu sur toutes les pages */
-  --content-padding:         40px;   /* Marge gauche/droite desktop/tablette — modifier ici = change partout */
-  --content-padding-mobile:  20px;   /*x§ Marge gauche/droite mobile  — modifier ici = change partout */
+  --content-padding:         40px;    /* Marge gauche/droite desktop/tablette — modifier ici = change partout */
+  --content-padding-mobile:  20px;    /* Marge gauche/droite mobile  — modifier ici = change partout */
 }
 
 /* ── RESET ── */
