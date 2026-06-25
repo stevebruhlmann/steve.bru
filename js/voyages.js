@@ -186,7 +186,8 @@ function initCompteurs() {
    4. CARTE INTERACTIVE D3.js
    · Points groupés par aéroport de destination
    · Lignes animées depuis Genève vers les aéroports
-   · Zoom molette + pinch mobile + drag
+   · Drag 2 doigts mobile (1 doigt = scroll page ; 2 doigts = déplacer la carte)
+   · Drag souris desktop
    · Boutons + / - / reset cliquables
    · Points à taille fixe indépendante du zoom
 ══════════════════════════════════════════════════════ */
