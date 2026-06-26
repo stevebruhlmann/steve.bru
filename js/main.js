@@ -71,7 +71,6 @@ document.addEventListener('navbar-ready', () => {
     heroScreen.classList.add('done');
     scrollHint.classList.add('hidden');
     mainContent.classList.add('revealed');
-    initScrollReveal(); /* Scroll reveal — sessions déjà vues */
     checkNavOverflow();
     document.documentElement.style.overflow = 'auto';
   }
@@ -97,7 +96,6 @@ document.addEventListener('navbar-ready', () => {
       hamburger.classList.add('visible');
       logo.style.cursor = 'pointer';
       mainContent.classList.add('revealed');
-      initScrollReveal(); /* Scroll reveal — première visite */
       checkNavOverflow();
     }, 550);
 
@@ -188,30 +186,6 @@ document.addEventListener('navbar-ready', () => {
       link.classList.add('active');
     }
   });
-
-  // ══════════════════════════════════════════════════════
-  // SCROLL REVEAL — apparition progressive des sections
-  // Cache toutes les .section au départ (scroll-hidden),
-  // puis les révèle une à une via IntersectionObserver
-  // quand elles entrent dans le viewport. Une seule fois
-  // par section (unobserve après déclenchement).
-  // ══════════════════════════════════════════════════════
-
-  function initScrollReveal() {
-    const revealSections = document.querySelectorAll('.section');
-    revealSections.forEach(s => s.classList.add('scroll-hidden'));
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.remove('scroll-hidden');
-          observer.unobserve(entry.target); /* Ne se déclenche qu'une fois par section */
-        }
-      });
-    }, { threshold: 0.1 }); /* 10% de la section visible suffit à déclencher */
-
-    revealSections.forEach(s => observer.observe(s));
-  }
   
   // ══════════════════════════════════════════════════════
   // HOVER SECTIONS — desktop uniquement
