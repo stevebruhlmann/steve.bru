@@ -66,6 +66,44 @@ async function loadNavbar() {
       sessionStorage.setItem('visited-site', '1'); /* Pour le pas mettre l'animation si on arrive sur indes.html pour la première fois via une autre page du site */
     }
 
+    /* ══════════════════════════════════════════════════════
+       SHRINK AU SCROLL (P17, point 2) — navbar compacte
+       Dès le 1er pixel de scroll, on pose .is-compact sur la
+       navbar → elle rétrécit (CSS). Retour tout en haut → on
+       la retire → elle reprend sa pleine hauteur.
+       - Desktop/tablette uniquement (> 680px) : le mobile garde
+         son comportement actuel (hamburger, pas de shrink).
+       - On ne touche au DOM que si l'état CHANGE (perf : pas une
+         écriture à chaque pixel scrollé).
+       - Listener passif : ne bloque pas le scroll (fluidité).
+    ══════════════════════════════════════════════════════ */
+    const navbarEl = document.getElementById('navbar');
+    if (navbarEl) {
+      let estCompact = false;   /* mémorise l'état courant pour ne réécrire que si ça change */
+
+      function majCompact() {
+        /* Mobile (≤ 680px) : on n'active jamais le shrink.
+           clientWidth (et non innerWidth) pour rester cohérent avec les
+           media queries CSS — exclut la scrollbar. */
+        if (document.documentElement.clientWidth <= 680) {
+          if (estCompact) {                 /* si on repasse sous 680 en étant compact, on nettoie */
+            navbarEl.classList.remove('is-compact');
+            estCompact = false;
+          }
+          return;
+        }
+        const doitEtreCompact = window.scrollY > 0;   /* 1er pixel = compact */
+        if (doitEtreCompact !== estCompact) {          /* l'état a changé → on agit */
+          navbarEl.classList.toggle('is-compact', doitEtreCompact);
+          estCompact = doitEtreCompact;
+        }
+      }
+
+      window.addEventListener('scroll', majCompact, { passive: true });
+      window.addEventListener('resize', majCompact, { passive: true });
+      majCompact();   /* état initial correct si la page charge déjà scrollée */
+    }
+
     /* ── Fil d'Ariane — généré dynamiquement selon la page ── */
     const breadcrumbMap = {
       'voyages':      'Voyages',

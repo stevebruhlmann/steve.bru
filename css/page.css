@@ -30,9 +30,17 @@
   cursor: pointer;
   user-select: none;
   white-space: nowrap;
-  animation: none;
+animation: none;
   z-index: 1;
   text-shadow: var(--logo-shadow);   /* P14 — détache le logo du fond sur pages secondaires (navbar sur photo de hero) */
+}
+
+/* Logo réduit en mode compact (P17, point 2) — pages secondaires.
+   La position reste gérée par top:50% (centré dans la navbar), qui suit
+   automatiquement la nouvelle hauteur → seule la taille change ici.
+   Sélecteur :has() : body.page-secondary contenant une navbar compacte. */
+.page-secondary:has(#navbar.is-compact) #site-logo {
+  font-size: var(--logo-size-compact);
 }
 
   /* ── Lien de navigation actif — page courante ── */
