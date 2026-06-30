@@ -204,7 +204,7 @@ a {
   animation: fadeIn 1.2s ease forwards;
 
   transition:
-  scale var(--transition),
+  font-size var(--transition),
   top var(--transition),
   left var(--transition),
   transform var(--transition);
@@ -223,18 +223,17 @@ transform: translate(-50%, calc(-50% + var(--logo-nudge)));
   /* text-shadow hérité du bloc #site-logo principal (cascade) — pas redéclaré ici (DRY). P14 */
   }
 
-/* Logo rangé en mode compact (P18) — réduit via scale() inclus DANS transform
-   (pas font-size, pas scale individuel). font-size modifierait la hauteur réelle
-   → recalcul du -50% → saut. scale en propriété séparée → couche non transitionnée
-   réconciliée au snap → saut résiduel. Tout regroupé dans la seule propriété
-   transitionnée (transform) → réduction fluide, aucun claquement final.
-   top suit la nouvelle hauteur de navbar. Sélecteur combiné : logo suit l'état
-   compact de la navbar. */
+/* Logo en mode compact (P18) — la navbar rétrécit (--nav-h → --nav-h-compact).
+   Le logo reste à mi-hauteur ET rétrécit, mais SANS animer `top` :
+   `top` est une propriété de position (main thread) ; l'animer en même temps
+   que le scale (compositeur/GPU) désynchronise les deux → saut en fin de course.
+   Solution : `top` reste constant (hérité de .in-nav = mi-hauteur navbar grande),
+   et on fait monter le logo à la mi-hauteur de la navbar réduite via le transform.
+   → translate + scale dans UNE seule propriété compositée = mouvement fluide, zéro saut.
+   Montée = (nav-h-compact − nav-h)/2, négative (le logo monte). */
 #navbar.is-compact #site-logo.in-nav {
-/* Même transform que l'état normal + scale() ajouté à la fin : tout dans
-     UNE propriété transitionnée → réduction fluide sans réconciliation finale. */
-transform: translate(-50%, calc(-50% + var(--logo-nudge))) scale(var(--logo-scale-compact));
-/*top: calc(var(--nav-h-compact) / 2);*/
+  transition:none;
+transform: translate(-50%, calc(-50% + var(--logo-nudge) + (var(--nav-h-compact) - var(--nav-h)) / 2)) scale(var(--logo-scale-compact));
 }
 
 /* Placeholder invisible — même taille que le logo in-nav,
