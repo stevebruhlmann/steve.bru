@@ -36,7 +36,6 @@
   --navbar-line:             rgba(74, 154, 142, 1);   /* Bleu pétrole (--accent #4a9a8e) opaque — rgb() en dur car var hex ne porte pas d'alpha */
   --navbar-shadow:           0 5px 14px rgba(0, 0, 0, 1);   /* P17 — ombre portée sous la navbar (détache du hero clair). Régler : flou 14px = étalement, alpha 1 = intensité, offset 5px = distance */
   --hairline-dim:            0.65;   /* P17 — opacité de la hairline atténuée (footer + navbar compacte). Un seul réglage pilote les deux. */
-  --navbar-radius:           20px;   /* P17 — rayon des coins bas de la navbar (test) */
 
   /* ── NAVBAR — état rétréci au scroll (P17, point 2) ─────────────────
      Quand l'utilisateur scrolle (1er pixel), la navbar passe en mode
@@ -45,7 +44,7 @@
      --nav-h-compact     : hauteur réduite (défaut 44px ; testable 32px plus tard)
      --logo-size-compact : taille du logo rangé en mode compact (liens = 0.8rem) */
   --nav-h-compact:           44px;
-  --logo-size-compact:       1.6rem;
+  --logo-scale-compact:     0.889;  /* P17 — facteur scale logo compact (= 1.6rem ÷ 1.8rem). Si on change la taille compact, recalculer ce ratio. */
 
   /* ── OMBRES DE TEXTE SUR PHOTO ──────────────────────────────────────
      text-shadow appliqué aux textes posés sur une photo (hero) ou sur la
@@ -205,10 +204,10 @@ a {
   animation: fadeIn 1.2s ease forwards;
 
   transition:
-    font-size var(--transition),
-    top var(--transition),
-    left var(--transition),
-    transform var(--transition);
+  scale var(--transition),
+  top var(--transition),
+  left var(--transition),
+  transform var(--transition);
 }
 
 /* État après scroll : dans la navbar — taille fixe, jamais modifiée */
@@ -216,21 +215,26 @@ a {
   font-size: 1.8rem;
   top: calc(var(--nav-h) / 2);
   left: 50%;
-  transform: translate(-50%, -50%);
-  /* Compensation centre optique police — voir --logo-nudge dans :root.
-     translate (propriété individuelle) se compose par-dessus le transform
-     ci-dessus sans le remplacer. */
-  translate: 0 var(--logo-nudge);
+/* Compensation centre optique police (--logo-nudge) fusionnée dans transform :
+     une seule propriété compositée = pas de couche translate/scale séparée à
+     réconcilier en fin de transition (cause du saut pixel — P18). */
+transform: translate(-50%, calc(-50% + var(--logo-nudge)));
   cursor: pointer;
   /* text-shadow hérité du bloc #site-logo principal (cascade) — pas redéclaré ici (DRY). P14 */
   }
 
-  /* Logo rangé en mode compact (P17, point 2) — plus petit et recalé sur la
-   nouvelle hauteur de navbar. Sélecteur combiné : le logo suit l'état compact
-   de la navbar. translate (--logo-nudge) hérité de .in-nav, non redéclaré. */
+/* Logo rangé en mode compact (P18) — réduit via scale() inclus DANS transform
+   (pas font-size, pas scale individuel). font-size modifierait la hauteur réelle
+   → recalcul du -50% → saut. scale en propriété séparée → couche non transitionnée
+   réconciliée au snap → saut résiduel. Tout regroupé dans la seule propriété
+   transitionnée (transform) → réduction fluide, aucun claquement final.
+   top suit la nouvelle hauteur de navbar. Sélecteur combiné : logo suit l'état
+   compact de la navbar. */
 #navbar.is-compact #site-logo.in-nav {
-  font-size: var(--logo-size-compact);
-  top: calc(var(--nav-h-compact) / 2);
+/* Même transform que l'état normal + scale() ajouté à la fin : tout dans
+     UNE propriété transitionnée → réduction fluide sans réconciliation finale. */
+transform: translate(-50%, calc(-50% + var(--logo-nudge))) scale(var(--logo-scale-compact));
+/*top: calc(var(--nav-h-compact) / 2);*/
 }
 
 /* Placeholder invisible — même taille que le logo in-nav,
@@ -317,7 +321,6 @@ a {
   backdrop-filter: blur(8px);                      /* Voile : flou léger du contenu qui défile dessous */
   -webkit-backdrop-filter: blur(8px);              /* Préfixe Safari (obligatoire) */
   box-shadow: var(--navbar-shadow);                /* P17 — ombre portée permanente : détache la navbar du contenu/hero clair */
-  border-radius: 0 0 var(--navbar-radius) var(--navbar-radius);   /* P17 — coins bas arrondis (test 20px) */
   transition: background var(--nav-transition), height var(--nav-transition);
 }
 
@@ -342,8 +345,8 @@ a {
 #navbar::after {
   content: "";
   position: absolute;
-  left: var(--navbar-radius);              /* P17 — écartée des bords de la largeur du rayon pour rester dans les coins arrondis */
-  right: var(--navbar-radius);
+  left: 0;
+  right: 0;
   bottom: 0;
   height: 1px;
   background: linear-gradient(to right,
